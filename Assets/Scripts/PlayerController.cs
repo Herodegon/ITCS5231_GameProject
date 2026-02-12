@@ -1,17 +1,26 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Rendering.Universal;
+
+enum PlayerState
+{
+    Moving,
+    FishSnagged
+}
 
 public class PlayerController : MonoBehaviour
 {
     [Header("Player Settings")]
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float acceleration = 2f;
+    [SerializeField] private float deceleration = 1f; // How fast boat slows down
+    [SerializeField] private float turnSpeed = 90f; // Degrees per second
+    [SerializeField] private float driftTurnRate = 0.5f; // How much velocity turns with the boat
 
     [Header("Debug Settings")]
     [SerializeField] private bool showVelocity = false;
     [SerializeField] private float velocityDebugScale = 1f;
 
+    private Rigidbody playerRigidbody;
     private Vector3 currentVelocity;
     private Vector3 currentDirection;
     private LineRenderer velocityLine;
@@ -19,7 +28,6 @@ public class PlayerController : MonoBehaviour
     private InputActionAsset inputActions;
     private Vector2 movementInput;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         // Reset global input action map based on Unity recommendations
@@ -35,44 +43,69 @@ public class PlayerController : MonoBehaviour
         velocityLine.positionCount = 2;
 
         // Initialize velocity and direction
+        playerRigidbody = GetComponent<Rigidbody>();
         currentVelocity = Vector3.zero;
-        currentDirection = Vector3.forward;
+        currentDirection = transform.forward;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        UpdateMovement();
-        UpdateDirection();
+        // Only update visuals in Update
         UpdateVelocityLine();
     }
 
     void OnMove(InputValue value)
     {
-        // Movement input should be relative to camera orientation, disregarding vertical rotation
         movementInput = value.Get<Vector2>();
+    }
+
+    private void FixedUpdate()
+    {
+        UpdateRotation();
+        UpdateMovement();
+    }
+
+    private void UpdateRotation()
+    {
+        // Horizontal input (A/D or Left/Right) controls turning
+        if (Mathf.Abs(movementInput.x) > 0.1f)
+        {
+            float turnAmount = movementInput.x * turnSpeed * Time.fixedDeltaTime;
+            Quaternion turnRotation = Quaternion.Euler(0f, turnAmount, 0f);
+            transform.rotation = transform.rotation * turnRotation;
+        }
+
+        // Gradually turn the velocity direction toward where boat is facing (drift effect)
+        if (currentVelocity.magnitude > 0.1f)
+        {
+            Vector3 currentVelDirection = currentVelocity.normalized;
+            Vector3 targetDirection = transform.forward;
+            
+            // Smoothly rotate velocity toward facing direction
+            currentVelDirection = Vector3.Slerp(currentVelDirection, targetDirection, driftTurnRate * Time.fixedDeltaTime);
+            currentVelocity = currentVelDirection * currentVelocity.magnitude;
+        }
     }
 
     private void UpdateMovement()
     {
-        // Apply camera-relative movement directly in UpdateMovement
-        Vector3 inputDirection = new Vector3(movementInput.x, 0f, movementInput.y);
-        Vector3 cameraRelativeMovement = Camera.main.transform.TransformDirection(inputDirection);
-        cameraRelativeMovement.y = 0;
+        // Vertical input (W/S or Up/Down) controls forward/backward speed
+        float forwardInput = movementInput.y;
         
-        Vector3 movement = cameraRelativeMovement.normalized;
-        currentVelocity = Vector3.Lerp(currentVelocity, movement * moveSpeed, acceleration * Time.deltaTime);
-        transform.Translate(currentVelocity * Time.deltaTime, Space.World);
-    }
-
-    private void UpdateDirection()
-    {
-        if (currentVelocity.magnitude > 0.1f)
+        if (Mathf.Abs(forwardInput) > 0.1f)
         {
-            currentDirection = currentVelocity.normalized;
-            Quaternion targetRotation = Quaternion.LookRotation(currentDirection);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * acceleration);
+            // Accelerate in the direction the boat is facing
+            Vector3 targetVelocity = transform.forward * forwardInput * moveSpeed;
+            currentVelocity = Vector3.Lerp(currentVelocity, targetVelocity, acceleration * Time.fixedDeltaTime);
         }
+        else
+        {
+            // Decelerate when no input (boat drifts to a stop)
+            currentVelocity = Vector3.Lerp(currentVelocity, Vector3.zero, deceleration * Time.fixedDeltaTime);
+        }
+
+        // Apply movement to Rigidbody
+        playerRigidbody.MovePosition(playerRigidbody.position + currentVelocity * Time.fixedDeltaTime);
     }
 
     private void UpdateVelocityLine()

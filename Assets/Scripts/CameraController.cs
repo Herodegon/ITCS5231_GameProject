@@ -14,8 +14,7 @@ public class CameraController : MonoBehaviour
         InitializeCamera();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void LateUpdate()
     {
         MoveCamera(player.transform);
     }
