@@ -15,6 +15,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float deceleration = 1f; // How fast boat slows down
     [SerializeField] private float turnSpeed = 90f; // Degrees per second
     [SerializeField] private float driftTurnRate = 0.5f; // How much velocity turns with the boat
+    [SerializeField] private LayerMask layerMask;
+
+    [Header("Combat Settings")]
+    [SerializeField] private WeaponManager weaponManager;
 
     [Header("Debug Settings")]
     [SerializeField] private bool showVelocity = false;
@@ -57,6 +61,22 @@ public class PlayerController : MonoBehaviour
     void OnMove(InputValue value)
     {
         movementInput = value.Get<Vector2>();
+    }
+
+    void OnClick(InputValue value)
+    {
+        Debug.Log("Fire input received");
+        if (value.isPressed)
+        {
+            // Get mouse position in world space
+            Vector3 mouseScreenPos = Mouse.current.position.ReadValue();
+            Ray ray = Camera.main.ScreenPointToRay(mouseScreenPos);
+            RaycastHit hit;
+            if (Physics.Raycast(ray, out hit, layerMask))
+            {
+                weaponManager.UseWeapon(hit.point);
+            }
+        }
     }
 
     private void FixedUpdate()
