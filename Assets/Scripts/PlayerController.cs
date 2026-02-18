@@ -58,12 +58,12 @@ public class PlayerController : MonoBehaviour
         UpdateVelocityLine();
     }
 
-    void OnMove(InputValue value)
+    public void OnMove(InputValue value)
     {
         movementInput = value.Get<Vector2>();
     }
 
-    void OnClick(InputValue value)
+    public void OnClick(InputValue value)
     {
         Debug.Log("Fire input received");
         if (value.isPressed)
@@ -72,7 +72,7 @@ public class PlayerController : MonoBehaviour
             Vector3 mouseScreenPos = Mouse.current.position.ReadValue();
             Ray ray = Camera.main.ScreenPointToRay(mouseScreenPos);
             RaycastHit hit;
-            if (Physics.Raycast(ray, out hit, layerMask))
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, layerMask))
             {
                 weaponManager.UseWeapon(hit.point);
             }
@@ -99,7 +99,7 @@ public class PlayerController : MonoBehaviour
         if (currentVelocity.magnitude > 0.1f)
         {
             Vector3 currentVelDirection = currentVelocity.normalized;
-            Vector3 targetDirection = transform.forward;
+            Vector3 targetDirection = transform.forward * Mathf.Sign(Vector3.Dot(currentVelDirection, transform.forward)); // Keep forward/backward direction
             
             // Smoothly rotate velocity toward facing direction
             currentVelDirection = Vector3.Slerp(currentVelDirection, targetDirection, driftTurnRate * Time.fixedDeltaTime);
