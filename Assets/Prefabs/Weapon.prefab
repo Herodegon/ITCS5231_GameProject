@@ -48,10 +48,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   weaponName: Grandpa's Rod
+  weaponType: 0
   damage: 1
   fireRate: 1
-  range: 100
-  castSpeed: 1.5
+  range: 10
+  castSpeed: 0.75
   equipPoint: {fileID: 2126059808341346052}
   firePoint: {fileID: 546810617602831722}
 --- !u!1 &8097941501839585411

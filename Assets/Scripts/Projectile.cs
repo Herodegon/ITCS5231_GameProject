@@ -4,11 +4,12 @@ public class Projectile : MonoBehaviour
 {
     [Header("Projectile Settings")]
     [SerializeField] public Vector3 hitboxSize = new Vector3(0.5f, 0.5f, 0.5f);
-    
-    [SerializeField] private int numPoints = 32;
-    
+
     private Vector3 startPosition;
     private Vector3 targetPosition;
+    private bool hasLanded;
+    
+    public bool HasLanded => hasLanded;
 
     void OnTriggerEnter(Collider other)
     {
@@ -23,6 +24,7 @@ public class Projectile : MonoBehaviour
     {
         startPosition = transform.position;
         targetPosition = target;
+        hasLanded = false;
 
         // Start the arc movement
         StartCoroutine(ArcMovement(castSpeed));
@@ -38,7 +40,7 @@ public class Projectile : MonoBehaviour
 
             // Calculate the arc position using a parabolic formula
             Vector3 currentPosition = Vector3.Lerp(startPosition, targetPosition, t);
-            currentPosition.y += Mathf.Sin(t * Mathf.PI) * 2f; // Adjust the height of the arc
+            currentPosition.y += Mathf.Sin(t * Mathf.PI) * 2f; // Add vertical arc
 
             transform.position = currentPosition;
             yield return null;
@@ -46,5 +48,6 @@ public class Projectile : MonoBehaviour
 
         // Ensure the projectile ends at the target position
         transform.position = targetPosition;
+        hasLanded = true;
     }
 }

@@ -8,10 +8,16 @@ public class WeaponManager : MonoBehaviour
     [SerializeField] public GameObject projectile;
     [SerializeField] public Dictionary<string, List<GameObject>> items = new Dictionary<string, List<GameObject>>();
     [SerializeField] public Transform weaponMountPoint;
+    [SerializeField] private int trajectoryLinePoints = 16;
+
+    private LineRenderer trajectoryLine;
 
     void Start()
     {
         EquipWeapon(weapon);
+
+        // Create LineRenderer for trajectory visualization
+        trajectoryLine = HelperClass.InitRenderLine(gameObject, trajectoryLinePoints);
     }
 
     private void EquipWeapon(GameObject newWeapon)
@@ -23,13 +29,33 @@ public class WeaponManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public void UseWeapon(Vector3 cursorPosition)
     {
-        if (weapon != null)
+        if (weapon == null) return;
+
+        Weapon weaponScript = weapon.GetComponent<Weapon>();
+        if (weaponScript != null)
         {
-            Weapon weaponScript = weapon.GetComponent<Weapon>();
-            if (weaponScript != null)
-            {
-                weaponScript.Fire(projectile, cursorPosition);
-            }
+            weaponScript.Fire(projectile, cursorPosition);
+        }
+    }
+
+    public void AddItem(string itemType, GameObject itemPrefab)
+    {
+        if (!items.ContainsKey(itemType))
+        {
+            items[itemType] = new List<GameObject>();
+        }
+        items[itemType].Add(itemPrefab);
+    }
+
+    public void DrawTrajectory(Vector3 targetPosition)
+    {
+        if (weapon == null) return;
+
+        Weapon weaponScript = weapon.GetComponent<Weapon>();
+        if (weaponScript != null)
+        {
+            Vector3[] trajectoryPoints = weaponScript.CalculateTrajectory(targetPosition, trajectoryLinePoints);
+            trajectoryLine.SetPositions(trajectoryPoints);
         }
     }
 }

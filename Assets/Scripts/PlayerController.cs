@@ -24,13 +24,20 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private bool showVelocity = false;
     [SerializeField] private float velocityDebugScale = 1f;
 
+    #region Physics Variables
     private Rigidbody playerRigidbody;
     private Vector3 currentVelocity;
-    private Vector3 currentDirection;
     private LineRenderer velocityLine;
 
+    #endregion
+
+    #region Input Variables
     private InputActionAsset inputActions;
+    private InputAction aimAction;
     private Vector2 movementInput;
+    private bool isAiming;
+
+    #endregion
 
     void Start()
     {
@@ -39,46 +46,67 @@ public class PlayerController : MonoBehaviour
         inputActions.Disable();
         inputActions.FindActionMap("Player").Enable();
 
+        aimAction = inputActions.FindAction("Aim");
+
         // Create LineRenderer
-        velocityLine = gameObject.AddComponent<LineRenderer>();
-        velocityLine.startWidth = 0.1f;
-        velocityLine.endWidth = 0.1f;
-        velocityLine.material = new Material(Shader.Find("Sprites/Default"));
-        velocityLine.positionCount = 2;
+        velocityLine = HelperClass.InitRenderLine(gameObject, 2, 0.1f);
 
         // Initialize velocity and direction
         playerRigidbody = GetComponent<Rigidbody>();
         currentVelocity = Vector3.zero;
-        currentDirection = transform.forward;
     }
 
     void Update()
     {
-        // Only update visuals in Update
-        UpdateVelocityLine();
+        #region Input Checking
+        if (aimAction != null)
+        {
+            if (aimAction.WasPressedThisFrame())
+            {
+                Debug.Log("Aim input received");
+                isAiming = true;
+            }
+            else if (aimAction.WasReleasedThisFrame())
+            {
+                Debug.Log("Aim input released");
+                isAiming = false;
+            }
+        }
+
+        #endregion
+
+        #region Visuals
+        DrawVelocityLine();
+        if (isAiming)
+        {
+            weaponManager.DrawTrajectory(HelperClass.GetMouseWorldPosition(Camera.main, 100f, layerMask));
+        }
+        else if (aimAction != null && aimAction.WasReleasedThisFrame())
+        {
+            weaponManager.DrawTrajectory(Vector3.zero); // Clear trajectory by setting to zero or you could disable the line renderer
+        }
+
+        #endregion
     }
 
+    #region Input Callbacks
     public void OnMove(InputValue value)
     {
         movementInput = value.Get<Vector2>();
     }
 
-    public void OnClick(InputValue value)
+    public void OnFire(InputValue value)
     {
         Debug.Log("Fire input received");
         if (value.isPressed)
         {
-            // Get mouse position in world space
-            Vector3 mouseScreenPos = Mouse.current.position.ReadValue();
-            Ray ray = Camera.main.ScreenPointToRay(mouseScreenPos);
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit, Mathf.Infinity, layerMask))
-            {
-                weaponManager.UseWeapon(hit.point);
-            }
+            weaponManager.UseWeapon(HelperClass.GetMouseWorldPosition(Camera.main, 100f, layerMask));
         }
     }
 
+    #endregion
+
+    #region Physics and Movement
     private void FixedUpdate()
     {
         UpdateRotation();
@@ -127,8 +155,10 @@ public class PlayerController : MonoBehaviour
         // Apply movement to Rigidbody
         playerRigidbody.MovePosition(playerRigidbody.position + currentVelocity * Time.fixedDeltaTime);
     }
+    #endregion
 
-    private void UpdateVelocityLine()
+    #region Private Helper Methods
+    private void DrawVelocityLine()
     {
         if (showVelocity)
         {
@@ -145,4 +175,6 @@ public class PlayerController : MonoBehaviour
             velocityLine.enabled = false;
         }
     }
+
+    #endregion
 }

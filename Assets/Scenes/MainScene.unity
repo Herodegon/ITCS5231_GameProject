@@ -637,7 +637,7 @@ GameObject:
   - component: {fileID: 476128865}
   m_Layer: 0
   m_Name: Environment
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1628,6 +1628,7 @@ MonoBehaviour:
   weapon: {fileID: 6573777256686717983, guid: 3ca1f36d579f2a04eb8debd8b9d30f82, type: 3}
   projectile: {fileID: 4115626492044037021, guid: 8b93a3d5bd3b19e45b0c1482d9da4810, type: 3}
   weaponMountPoint: {fileID: 1279322466}
+  trajectoryLinePoints: 16
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

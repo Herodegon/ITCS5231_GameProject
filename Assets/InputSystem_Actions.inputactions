@@ -224,7 +224,7 @@
                     "name": "",
                     "id": "a632dbb4-cc3f-4233-8e31-954b8c6bf451",
                     "path": "<Mouse>/rightButton",
-                    "interactions": "Hold",
+                    "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
                     "action": "Aim",

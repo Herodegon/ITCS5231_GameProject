@@ -96,9 +96,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de25714362428f44ca56523a4ea8fe1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  damage: 0
-  lifetime: 5
-  arcHeight: 3
+  hitboxSize: {x: 0.5, y: 0.5, z: 0.5}
+  apexHeight: 2
+  apexTime: 0.5
 --- !u!65 &1552331758808583274
 BoxCollider:
   m_ObjectHideFlags: 0
