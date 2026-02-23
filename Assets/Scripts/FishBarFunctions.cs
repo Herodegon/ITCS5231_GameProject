@@ -15,15 +15,13 @@ public class fishBarCreator : MonoBehaviour
     void Start()
     {
         isBarOn = false;
+        fishBar.SetActive(false);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (isBarOn == false)
-        {
-            fishBar.SetActive(false);
-        }
+        
     }
 
     //Create the fishing bar based on the stats passed in
@@ -42,5 +40,29 @@ public class fishBarCreator : MonoBehaviour
         redSect.rectTransform.sizeDelta = new Vector2(durability, 90);
         float pos = direction * 1125;
         playerIndicator.rectTransform.anchoredPosition = new Vector2(pos, 0.0f);
+    }
+
+    void destroyBar()
+    {
+        isBarOn = false;
+        fishBar.SetActive(false);
+    }
+
+    //check if which section the player is in and return 1 for green, 2 for red, and 3 for maroon
+    int checkBar(int durability, int catchRate, float direction)
+    {
+        float pos = direction * 1125;
+        if(pos >= ((1125/2) - (catchRate / 2)) && pos <= ((1125/2) + (catchRate / 2)))
+        {
+            return 1;
+        }
+        if(pos >= ((1125/2) - (durability / 2)) && pos <= ((1125/2) + (durability / 2)))
+        {
+            return 2;
+        }
+        else
+        {
+            return 3;
+        }
     }
 }
