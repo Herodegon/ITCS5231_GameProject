@@ -7,3 +7,11 @@ public enum WeaponType
     Cannon,
     Net
 }
+
+public enum FishType
+{
+    Basic,
+    Fast,
+    Tank,
+    Aggressive
+}

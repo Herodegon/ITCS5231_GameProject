@@ -51,6 +51,16 @@ public class WeaponManager : MonoBehaviour
     {
         if (weapon == null) return;
 
+        if (targetPosition == Vector3.zero)
+        {
+            trajectoryLine.enabled = false;
+            return;
+        }
+        else if (!trajectoryLine.enabled)
+        {
+            trajectoryLine.enabled = true;
+        }
+
         Weapon weaponScript = weapon.GetComponent<Weapon>();
         if (weaponScript != null)
         {

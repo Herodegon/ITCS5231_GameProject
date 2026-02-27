@@ -23,6 +23,13 @@ public class Weapon : MonoBehaviour
     {
         if (projectilePrefab == null) return;
 
+        if ((cursorPosition - firePoint.position).magnitude > range)
+        {
+            cursorPosition = firePoint.position + (cursorPosition - firePoint.position).normalized * range;
+        }
+
+         // Clean up any existing cast
+
         // Clean up any existing cast
         CleanUpCast();
 
@@ -69,6 +76,12 @@ public class Weapon : MonoBehaviour
     public Vector3[] CalculateTrajectory(Vector3 targetPosition, int points)
     {
         Vector3[] trajectoryPoints = new Vector3[points];
+
+        // Clamp trajectory to weapon's max range
+        if ((targetPosition - firePoint.position).magnitude > range)
+        {
+            targetPosition = firePoint.position + (targetPosition - firePoint.position).normalized * range;
+        }
         switch(weaponType)
         {
             case WeaponType.Rod:

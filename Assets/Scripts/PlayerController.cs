@@ -83,7 +83,7 @@ public class PlayerController : MonoBehaviour
         }
         else if (aimAction != null && aimAction.WasReleasedThisFrame())
         {
-            weaponManager.DrawTrajectory(Vector3.zero); // Clear trajectory by setting to zero or you could disable the line renderer
+            weaponManager.DrawTrajectory(Vector3.zero);
         }
 
         #endregion
