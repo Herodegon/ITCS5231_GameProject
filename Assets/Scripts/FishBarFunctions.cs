@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum BarState {Green, Red, Maroon, Off};
+
 public class fishBarCreator : MonoBehaviour
 {
     public bool isBarOn;
@@ -10,6 +12,7 @@ public class fishBarCreator : MonoBehaviour
     [SerializeField] private Image redSect;
     [SerializeField] private Image greenSect;
     [SerializeField] private Image playerIndicator;
+    public BarState State;
 
     // Start is called before the first frame update
     void Start()
@@ -46,23 +49,24 @@ public class fishBarCreator : MonoBehaviour
     {
         isBarOn = false;
         fishBar.SetActive(false);
+        State = BarState.Off;
     }
 
     //check if which section the player is in and return 1 for green, 2 for red, and 3 for maroon
-    int checkBar(int durability, int catchRate, float direction)
+    void checkBar(int durability, int catchRate, float direction)
     {
         float pos = direction * 1125;
         if(pos >= ((1125/2) - (catchRate / 2)) && pos <= ((1125/2) + (catchRate / 2)))
         {
-            return 1;
+            State = BarState.Green;
         }
         if(pos >= ((1125/2) - (durability / 2)) && pos <= ((1125/2) + (durability / 2)))
         {
-            return 2;
+            State = BarState.Red;
         }
         else
         {
-            return 3;
+            State = BarState.Maroon;
         }
     }
 }
