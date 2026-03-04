@@ -5,16 +5,41 @@ using UnityEngine.UI;
 
 public class Bar : MonoBehaviour
 {
-    public Slider slider;
+    public Slider healthBar;
+    public Slider fuelBar;
 
-    public void SetMaxBar(int value)
+    public void setMaxBar(int value, bool health)
     {
-        slider.maxValue = value;
-        slider.value = value;
+        if(health)
+        {
+            healthBar.maxValue = value;
+            healthBar.value = value;
+        }
+        else
+        {
+            fuelBar.maxValue = value;
+            fuelBar.value = value;
+        }
     }
 
-    public void SetBar(int value)
+    public void setBar(int value, bool health)
     {
-        slider.value = value;
+        if (health)
+        {
+            healthBar.value = value;
+        }
+        else
+        {
+            fuelBar.value = value;
+        }
+    }
+
+    void Update()
+    {
+        if (Input.GetKey("d"))
+        {
+            setBar(90, true);
+            setBar(50, false);
+        }   
     }
 }
