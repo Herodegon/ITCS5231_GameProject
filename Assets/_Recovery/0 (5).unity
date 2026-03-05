@@ -1132,14 +1132,6 @@ MonoBehaviour:
   tensionThreshold: 10
   catchDistance: 2
   combatUI: {fileID: 0}
-  caughtFish: {fileID: 0}
-  playerPullDirection: {x: 0, y: 0, z: 0}
-  fishPullDirection: {x: 0, y: 0, z: 0}
-  currentTension: 0
-  currentDistance: 0
-  inCombat: 0
-  inputActions: {fileID: 0}
-  pullInput: {x: 0, y: 0}
 --- !u!114 &1222737999
 MonoBehaviour:
   m_ObjectHideFlags: 0

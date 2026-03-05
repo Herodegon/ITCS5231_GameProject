@@ -54,7 +54,9 @@ MonoBehaviour:
   range: 10
   castSpeed: 0.75
   equipPoint: {fileID: 2126059808341346052}
+  fishingLine: {fileID: 0}
   firePoint: {fileID: 546810617602831722}
+  lineNodeCount: 25
 --- !u!1 &8097941501839585411
 GameObject:
   m_ObjectHideFlags: 0
