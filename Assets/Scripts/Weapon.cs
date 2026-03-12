@@ -3,7 +3,7 @@ using UnityEngine;
 public class Weapon : MonoBehaviour
 {
     [Header("Weapon Settings")]
-    [SerializeField] private string weaponName;
+    [SerializeField] public string weaponName;
     [SerializeField] public WeaponType weaponType;
     [SerializeField] public float damage = 1f; // Damage dealt to target
     [SerializeField] public float fireRate = 1f; // Amount of time in seconds damage is applied to target after firing
@@ -19,7 +19,7 @@ public class Weapon : MonoBehaviour
 
     private GameObject projectileInstance;
 
-    public void Fire(GameObject projectilePrefab, Vector3 cursorPosition)
+    public void Fire(GameObject projectilePrefab, Vector3 cursorPosition, GameObject container)
     {
         if (projectilePrefab == null) return;
 
@@ -35,6 +35,7 @@ public class Weapon : MonoBehaviour
 
         // Spawn projectile
         projectileInstance = Instantiate(projectilePrefab, firePoint.position, Quaternion.identity);
+        projectileInstance.transform.SetParent(container.transform); // Parent to container for organization
         Projectile projectileScript = projectileInstance.GetComponent<Projectile>();
         if (projectileScript != null)
         {

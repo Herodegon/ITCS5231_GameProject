@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
+    public static System.Action<GameObject> OnFishHitEvent;
+
     [Header("Projectile Settings")]
     [SerializeField] public Vector3 hitboxSize = new Vector3(0.5f, 0.5f, 0.5f);
 
@@ -15,8 +17,17 @@ public class Projectile : MonoBehaviour
     {
         if (other.CompareTag("Fish"))
         {
-            // Notify weapon/manager that fish was hit
-            SendMessageUpwards("OnFishHit", other.gameObject, SendMessageOptions.DontRequireReceiver);
+            Debug.Log("Projectile hit a fish!");
+
+            // Send message to combat manager with the hit fish to start combat
+            // SendMessageUpwards("OnFishHit", other.transform.parent.gameObject, SendMessageOptions.DontRequireReceiver);
+
+            GameObject hitFish = other.transform.parent.gameObject;
+            OnFishHitEvent?.Invoke(hitFish);
+
+            transform.parent = hitFish.transform;
+            transform.localPosition = Vector3.zero; // Attach to the center of the fish
+            GetComponent<Collider>().enabled = false; // Disable hitbox after hitting a fish
         }
     }
 

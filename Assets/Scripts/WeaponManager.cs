@@ -10,6 +10,8 @@ public class WeaponManager : MonoBehaviour
     [SerializeField] public Transform weaponMountPoint;
     [SerializeField] private int trajectoryLinePoints = 16;
 
+    [SerializeField] private GameObject projectileContainer;
+
     private LineRenderer trajectoryLine;
 
     void Start()
@@ -34,7 +36,7 @@ public class WeaponManager : MonoBehaviour
         Weapon weaponScript = weapon.GetComponent<Weapon>();
         if (weaponScript != null)
         {
-            weaponScript.Fire(projectile, cursorPosition);
+            weaponScript.Fire(projectile, cursorPosition, projectileContainer);
         }
     }
 

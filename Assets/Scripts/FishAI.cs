@@ -1,5 +1,4 @@
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
@@ -9,7 +8,7 @@ enum FishState
     Interested,
     Fleeing,
     Attacking,
-    Hooked
+    Combat
 }
 
 public class FishAI : MonoBehaviour
@@ -19,17 +18,20 @@ public class FishAI : MonoBehaviour
     [SerializeField] public FishType fishType;
     [SerializeField] public Color fishColor = Color.red;
 
-    [Header("AI Settings")]
+    [Header("Movement Settings")]
     [SerializeField] public Vector3 startPosition;
     [SerializeField] public float speed = 2f;
     [SerializeField] public float acceleration = 1f;
     [SerializeField] public float deceleration = 1f; // How fast it slows
     [SerializeField] public float turnSpeed = 90f; // Degrees per second
+
+    [Header("AI Settings")]
     [SerializeField] public float wanderRadius = 5f; // Radius for choosing random wander targets around the fish's current position
     [SerializeField] public float wanderInterval = 10f; // Time in seconds between choosing new wander target
     [SerializeField] public float fleeTime = 2f; // Time in seconds to flee after player or bait is detected
     [SerializeField] public float detectionRadius = 5f; // Radius in which it will react to the player or their bait
     [SerializeField] public float fleeSpeedMultiplier = 1.5f; // Multiplier for speed when fleeing from player or bait
+    [SerializeField] public LayerMask layerMask;
 
     [Header("Fish Stats")]
     [SerializeField] public float health = 10f;
@@ -41,8 +43,8 @@ public class FishAI : MonoBehaviour
     [SerializeField] private GameObject debugDetectionRadiusPrefab;
     [SerializeField] private GameObject debugTargetPrefab;
 
+    public float currVelocity;
     private Vector3 wanderTarget;
-    private float currVelocity;
     private Transform baitTarget;
     private float distToTarget;
     private Coroutine lookAtTargetCoroutine;
@@ -97,7 +99,18 @@ public class FishAI : MonoBehaviour
         StateMachine();
     }
 
-#region AI Behavior
+    #region AI Behavior
+    public void EnterCombat()
+    {
+        fishState = FishState.Combat;
+        baitTarget = null;
+        currVelocity = 0f;
+        wanderTimer = 0f;
+        wanderRadius *= 5f;
+        speed *= fleeSpeedMultiplier * 3f; // Increase speed when entering combat to make it more challenging
+        acceleration *= 2f;
+    }
+
     private void StateMachine()
     {
         switch(fishState)
@@ -119,14 +132,7 @@ public class FishAI : MonoBehaviour
                     fishState = FishState.Wandering;
                     break;
                 }
-                if (currVelocity < 0.1f && Vector3.Angle(transform.forward, (baitTarget.position-transform.position).normalized) > 2f)
-                {
-                    if (lookAtTargetCoroutine == null)
-                    {
-                        lookAtTargetCoroutine = StartCoroutine(LookAtTarget(baitTarget));
-                    }
-                    break;
-                }
+                if (lookAtTargetCoroutine != null) break;
                 wanderTimer -= Time.fixedDeltaTime;
                 if (wanderTimer <= 0f)
                 {
@@ -135,7 +141,21 @@ public class FishAI : MonoBehaviour
                     float hesitationDistance = distToTarget * Random.Range(0.15f, 0.3f); // Randomize hesitation between 15% and 30% of the total travel distance
                     wanderTarget = transform.position + directionToBait * hesitationDistance;
                     wanderTimer = wanderInterval * 1.2f;
-                    Debug.Log("Fish is moving " + hesitationDistance.ToString("F2") + " units towards the bait, simulating hesitation.");
+                    if (Vector3.Angle(transform.forward, directionToBait) > 5f) // Only do hesitation if not already mostly facing the bait
+                    {
+                        lookAtTargetCoroutine = StartCoroutine(LookAtTarget(baitTarget));
+                    }
+                    break;
+                }
+                MoveTowards(wanderTarget);
+                break;
+            case FishState.Combat:
+                wanderTimer -= Time.fixedDeltaTime;
+                if (wanderTimer <= 0f || Vector3.Distance(transform.position, wanderTarget) < wanderRadius * 0.3f)
+                {
+                    Vector2 randomCircle = Random.insideUnitCircle.normalized * wanderRadius;
+                    wanderTarget = startPosition + new Vector3(randomCircle.x, 0, randomCircle.y);
+                    wanderTimer = wanderInterval * 0.75f; // More frequent target changes in combat to make it more erratic
                 }
                 MoveTowards(wanderTarget);
                 break;
@@ -144,13 +164,10 @@ public class FishAI : MonoBehaviour
 
     private void MoveTowards(Vector3 targetPosition = default)
     {
-        // Move towards the random point
         Vector3 directionToTarget = (targetPosition - transform.position).normalized;
         Quaternion targetRotation = Quaternion.LookRotation(directionToTarget);
         transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);
-        
-        // Give fish the illusion of velocity and friction as it moves through the water
-        // Check distance against max speed to prevent fish from overshooting and oscillating around the target point
+
         if (Vector3.Distance(transform.position, targetPosition) > currVelocity)
         {
             currVelocity = Mathf.Lerp(currVelocity, speed, acceleration * Time.deltaTime);
@@ -159,7 +176,20 @@ public class FishAI : MonoBehaviour
         {
             currVelocity = Mathf.Lerp(currVelocity, 0f, deceleration * Time.deltaTime);
         }
-        transform.position += transform.forward * currVelocity * Time.deltaTime;
+
+        Vector3 nextPos = transform.position + transform.forward * currVelocity * Time.deltaTime;
+
+        // Check if next position is still over water
+        if (Physics.Raycast(nextPos + Vector3.up * 5f, Vector3.down, 20f, layerMask))
+        {
+            transform.position = nextPos;
+        }
+        else
+        {
+            // No water ahead — stop and force a new wander target
+            currVelocity = 0f;
+            wanderTimer = 0f;
+        }
     }
 
     IEnumerator LookAtTarget(Transform target)

@@ -304,7 +304,7 @@ GameObject:
   m_Component:
   - component: {fileID: 188985337}
   m_Layer: 0
-  m_Name: Projectiles
+  m_Name: ProjectileContainer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -318,12 +318,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 188985336}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1045962532}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &258276419
 GameObject:
@@ -978,15 +978,15 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 984298199}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.5, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 465619729}
   - {fileID: 554125046}
   - {fileID: 2047414209}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1045962532}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &984298201
 MonoBehaviour:
@@ -1039,6 +1039,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 16
   weaponManager: {fileID: 2047414210}
+  fishHooked: {fileID: 0}
+  tetherStrafeSpeed: 2
+  tetherStrafePercent: 0.3
   showVelocity: 1
   velocityDebugScale: 1
 --- !u!54 &984298203
@@ -1111,7 +1114,10 @@ Transform:
   m_LocalPosition: {x: 0, y: 0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 984298200}
+  - {fileID: 1668576918}
+  - {fileID: 188985337}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1045962533
@@ -1123,23 +1129,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1045962531}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8e0ac4f8df98e7b4e8abe08ceed90b7b, type: 3}
+  m_Script: {fileID: 11500000, guid: 2244a4bfdaf31ba41b6986f421553125, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CombatManager
+  m_EditorClassIdentifier: '::'
   player: {fileID: 984298199}
-  reelSpeed: 2
-  fishStrength: 5
-  tensionThreshold: 10
-  catchDistance: 2
-  combatUI: {fileID: 0}
-  caughtFish: {fileID: 0}
-  playerPullDirection: {x: 0, y: 0, z: 0}
-  fishPullDirection: {x: 0, y: 0, z: 0}
-  currentTension: 0
-  currentDistance: 0
-  inCombat: 0
-  inputActions: {fileID: 0}
-  pullInput: {x: 0, y: 0}
+  fishTarget: {fileID: 0}
 --- !u!114 &1222737999
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1321,7 +1315,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1668576918}
   m_Layer: 0
-  m_Name: EntityManager
+  m_Name: EntityContainer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1335,13 +1329,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1668576917}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 173896395}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1045962532}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1976815951
 MonoBehaviour:
@@ -1420,6 +1414,7 @@ MonoBehaviour:
   projectile: {fileID: 4115626492044037021, guid: 8b93a3d5bd3b19e45b0c1482d9da4810, type: 3}
   weaponMountPoint: {fileID: 1279322466}
   trajectoryLinePoints: 16
+  projectileContainer: {fileID: 188985336}
 --- !u!1001 &914432914887435034
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1551,8 +1546,5 @@ SceneRoots:
   - {fileID: 258276423}
   - {fileID: 476128865}
   - {fileID: 329327554}
-  - {fileID: 1668576918}
   - {fileID: 1045962532}
   - {fileID: 71883740}
-  - {fileID: 188985337}
-  - {fileID: 984298200}

@@ -49,6 +49,7 @@ MonoBehaviour:
   projectile: {fileID: 4115626492044037021, guid: 8b93a3d5bd3b19e45b0c1482d9da4810, type: 3}
   weaponMountPoint: {fileID: 8869165702997797434}
   trajectoryLinePoints: 16
+  projectileContainer: {fileID: 0}
 --- !u!1 &6620302397150357475
 GameObject:
   m_ObjectHideFlags: 0
@@ -94,7 +95,7 @@ GameObject:
   - component: {fileID: 6177207079892846470}
   m_Layer: 0
   m_Name: Collider
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -208,7 +209,7 @@ GameObject:
   - component: {fileID: 9014544864817556605}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Player
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -282,6 +283,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 16
   weaponManager: {fileID: 1356943215472578528}
+  fishHooked: {fileID: 0}
+  tetherStrafeSpeed: 2
+  tetherStrafePercent: 0.3
   showVelocity: 1
   velocityDebugScale: 1
 --- !u!54 &9014544864817556605

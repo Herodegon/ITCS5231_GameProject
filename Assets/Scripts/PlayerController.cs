@@ -1,15 +1,16 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 enum PlayerState
 {
     Moving,
-    FishSnagged
+    Combat
 }
 
 public class PlayerController : MonoBehaviour
 {
-    [Header("Player Settings")]
+    [Header("Movement Settings")]
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float acceleration = 2f;
     [SerializeField] private float deceleration = 1f; // How fast boat slows down
@@ -18,7 +19,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private LayerMask layerMask;
 
     [Header("Combat Settings")]
-    [SerializeField] private WeaponManager weaponManager;
+    [SerializeField] public WeaponManager weaponManager;
+    [SerializeField] public GameObject fishHooked;
+    [SerializeField] private float tetherStrafeSpeed = 2f;
+    [SerializeField] private float tetherStrafePercent = 0.3f;
+    private float tetherAngle = 0f;
+    private PlayerState playerState = PlayerState.Moving;
 
     [Header("Debug Settings")]
     [SerializeField] private bool showVelocity = false;
@@ -75,6 +81,11 @@ public class PlayerController : MonoBehaviour
 
         #endregion
 
+        #region State Transitions
+        StateMachine();
+
+        #endregion
+
         #region Visuals
         DrawVelocityLine();
         if (isAiming)
@@ -100,6 +111,10 @@ public class PlayerController : MonoBehaviour
         Debug.Log("Fire input received");
         if (value.isPressed)
         {
+            // Prevent firing non-harpoon weapons while tethered to a fish
+            Weapon weapon = weaponManager.weapon.GetComponent<Weapon>();
+            if (weapon.weaponType != WeaponType.Harpoon && fishHooked != null) return;
+
             weaponManager.UseWeapon(HelperClass.GetMouseWorldPosition(Camera.main, 100f, layerMask));
         }
     }
@@ -109,8 +124,42 @@ public class PlayerController : MonoBehaviour
     #region Physics and Movement
     private void FixedUpdate()
     {
-        UpdateRotation();
-        UpdateMovement();
+        switch(playerState)
+        {
+            case PlayerState.Moving:
+                UpdateRotation();
+                UpdateMovement();
+                break;
+            case PlayerState.Combat:
+                UpdateTetheredRotation();
+                UpdateTetheredMovement();
+                break;
+        }
+    }
+
+    public void EnterCombat(GameObject fish)
+    {
+        fishHooked = fish;
+        playerState = PlayerState.Combat;
+    }
+
+    private void StateMachine()
+    {
+        switch(playerState)
+        {
+            case PlayerState.Moving:
+                if (fishHooked != null)
+                {
+                    playerState = PlayerState.Combat;
+                }
+                break;
+            case PlayerState.Combat:
+                if (fishHooked == null)
+                {
+                    playerState = PlayerState.Moving;
+                }
+                break;
+        }
     }
 
     private void UpdateRotation()
@@ -154,6 +203,50 @@ public class PlayerController : MonoBehaviour
 
         // Apply movement to Rigidbody
         playerRigidbody.MovePosition(playerRigidbody.position + currentVelocity * Time.fixedDeltaTime);
+    }
+
+    private void UpdateTetheredMovement()
+    {
+        if (fishHooked == null) return;
+
+        // Update tether angle based on horizontal input
+        if (Mathf.Abs(movementInput.x) > 0.1f)
+        {
+            tetherAngle += movementInput.x * tetherStrafeSpeed * Time.fixedDeltaTime;
+        }
+
+        // Calculate new position in a circle around the fish
+        Vector3 offset = new Vector3(Mathf.Sin(tetherAngle), 0f, Mathf.Cos(tetherAngle)) * tetherStrafePercent;
+        Vector3 targetPosition = fishHooked.transform.position + offset;
+
+        // Move towards the target position around the fish
+        Vector3 moveDirection = (targetPosition - playerRigidbody.position).normalized;
+
+        if (Vector3.Distance(playerRigidbody.position, targetPosition) > 10f)
+        {
+            currentVelocity = Vector3.Lerp(currentVelocity, moveDirection * moveSpeed * 1.5f, 10f * Time.fixedDeltaTime);
+        }
+        else
+        {
+            currentVelocity = Vector3.Lerp(currentVelocity, moveDirection * moveSpeed, acceleration * Time.fixedDeltaTime);
+        }
+
+        playerRigidbody.MovePosition(playerRigidbody.position + currentVelocity * Time.fixedDeltaTime);
+    }
+
+    private void UpdateTetheredRotation()
+    {
+        Transform fishTransform = fishHooked.transform;
+        Vector3 lookDir = fishTransform.position - playerRigidbody.position;
+        lookDir.y = 0;
+        if (lookDir.sqrMagnitude > 0.01f)
+        {
+            transform.rotation = Quaternion.Slerp(
+                transform.rotation,
+                Quaternion.LookRotation(lookDir),
+                turnSpeed * Time.fixedDeltaTime
+            );
+        }
     }
     #endregion
 
