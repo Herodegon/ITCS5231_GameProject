@@ -7,6 +7,9 @@ using UnityEngine.InputSystem;
 public class PauseMenu : MonoBehaviour
 {
     public GameObject pauseMenu;
+    public GameObject map;
+    public GameObject inventory;
+    public GameObject settings;
     public bool paused;
     public fishSlot[] fishSlot;
     public upgradeSlot[] upgradeSlot;
@@ -38,6 +41,9 @@ public class PauseMenu : MonoBehaviour
         Time.timeScale = 0;
         pauseMenu.SetActive(true);
         paused = true;
+        map.SetActive(false);
+        settings.SetActive(false);
+        inventory.SetActive(true);
     }
 
     void unpause()
@@ -59,15 +65,29 @@ public class PauseMenu : MonoBehaviour
         }
     }
 
-    public void addUpgrade(string name, int quantity, Sprite sprite)
+    public void addUpgrade(string name, int quantity, Sprite sprite, int type)
     {
-        for (int i = 0; i < upgradeSlot.Length; i++)
-        {
-            if (upgradeSlot[i].isFull == false)
-            {
-                upgradeSlot[i].addUpgrade(name, quantity, sprite);
-                return;
-            }
-        }
+        upgradeSlot[type].addUpgrade(name, quantity, sprite);
+    }
+
+    public void mapButton()
+    {
+        inventory.SetActive(false);
+        settings.SetActive(false);
+        map.SetActive(true);
+    }
+
+    public void settingsButton()
+    {
+        inventory.SetActive(false);
+        map.SetActive(false);
+        settings.SetActive(true);
+    }
+
+    public void inventoryButton()
+    {
+        map.SetActive(false);
+        settings.SetActive(false);
+        inventory.SetActive(true);
     }
 }

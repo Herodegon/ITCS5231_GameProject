@@ -33,13 +33,4 @@ public class Bar : MonoBehaviour
             fuelBar.value = value;
         }
     }
-
-    void Update()
-    {
-        if (Input.GetKey("d"))
-        {
-            setBar(90, true);
-            setBar(50, false);
-        }   
-    }
 }
