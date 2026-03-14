@@ -6,9 +6,7 @@ public class HelperClass
     public static Vector3 GetMouseWorldPosition(Camera cam, float distanceFromCamera, LayerMask layerMask)
     {
         Ray ray = cam.ScreenPointToRay(Mouse.current.position.ReadValue());
-        RaycastHit hit;
-
-        if (Physics.Raycast(ray, out hit, distanceFromCamera, layerMask))
+        if (Physics.Raycast(ray, out RaycastHit hit, distanceFromCamera, layerMask))
         {
             return hit.point;
         }

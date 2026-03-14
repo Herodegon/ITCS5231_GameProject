@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class Projectile : MonoBehaviour
@@ -5,10 +6,11 @@ public class Projectile : MonoBehaviour
     public static System.Action<GameObject> OnFishHitEvent;
 
     [Header("Projectile Settings")]
-    [SerializeField] public Vector3 hitboxSize = new Vector3(0.5f, 0.5f, 0.5f);
+    public Vector3 hitboxSize = new(0.5f,0.5f,0.5f);
 
     private Vector3 startPosition;
     private Vector3 targetPosition;
+    private Coroutine arcMovementCoroutine;
     private bool hasLanded;
     
     public bool HasLanded => hasLanded;
@@ -26,7 +28,13 @@ public class Projectile : MonoBehaviour
             OnFishHitEvent?.Invoke(hitFish);
 
             transform.parent = hitFish.transform;
-            transform.localPosition = Vector3.zero; // Attach to the center of the fish
+            if (arcMovementCoroutine != null)
+            {
+                StopCoroutine(arcMovementCoroutine);
+                arcMovementCoroutine = null;
+                hasLanded = true;
+            }
+            transform.localPosition = Vector3.zero; // Attach projectile to the fish
             GetComponent<Collider>().enabled = false; // Disable hitbox after hitting a fish
         }
     }
@@ -41,7 +49,7 @@ public class Projectile : MonoBehaviour
         StartCoroutine(ArcMovement(castSpeed));
     }
 
-    private System.Collections.IEnumerator ArcMovement(float castSpeed)
+    private IEnumerator ArcMovement(float castSpeed)
     {
         float elapsedTime = 0f;
         while (elapsedTime < castSpeed)

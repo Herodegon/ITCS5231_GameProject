@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[RequireComponent(typeof(LineRenderer))]
 public class FishingLine : MonoBehaviour
 {
     [Header("Line Settings")]
@@ -119,7 +120,7 @@ public class FishingLine : MonoBehaviour
                 if (dist < 0.0001f) continue;
 
                 float error = (dist - segLen) / dist;
-                Vector3 correction = delta * error * 0.5f;
+                Vector3 correction = (delta * error) * 0.5f;
 
                 if (i != 0)
                     currentPositions[i] += correction;

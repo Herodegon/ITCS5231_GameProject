@@ -8,6 +8,8 @@ enum PlayerState
     Combat
 }
 
+[RequireComponent(typeof(PlayerInput))]
+[RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement Settings")]
@@ -19,11 +21,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private LayerMask layerMask;
 
     [Header("Combat Settings")]
-    [SerializeField] public WeaponManager weaponManager;
-    [SerializeField] public GameObject fishHooked;
+    public WeaponManager weaponManager;
+    public GameObject fishHooked;
     [SerializeField] private float tetherStrafeSpeed = 2f;
     [SerializeField] private float tetherStrafePercent = 0.3f;
-    private float tetherAngle = 0f;
+    private float tetherAngle = 0f;  // Angle around the fish to strafe updated in runtime
     private PlayerState playerState = PlayerState.Moving;
 
     [Header("Debug Settings")]
@@ -192,7 +194,7 @@ public class PlayerController : MonoBehaviour
         if (Mathf.Abs(forwardInput) > 0.1f)
         {
             // Accelerate in the direction the boat is facing
-            Vector3 targetVelocity = transform.forward * forwardInput * moveSpeed;
+            Vector3 targetVelocity = (transform.forward * forwardInput) * moveSpeed;
             currentVelocity = Vector3.Lerp(currentVelocity, targetVelocity, acceleration * Time.fixedDeltaTime);
         }
         else
@@ -224,7 +226,7 @@ public class PlayerController : MonoBehaviour
 
         if (Vector3.Distance(playerRigidbody.position, targetPosition) > 10f)
         {
-            currentVelocity = Vector3.Lerp(currentVelocity, moveDirection * moveSpeed * 1.5f, 10f * Time.fixedDeltaTime);
+            currentVelocity = Vector3.Lerp(currentVelocity, moveDirection * (moveSpeed * 1.5f), 10f * Time.fixedDeltaTime);
         }
         else
         {

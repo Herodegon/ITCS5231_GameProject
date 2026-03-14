@@ -14,29 +14,29 @@ enum FishState
 public class FishAI : MonoBehaviour
 {
     [Header("Fish Settings")]
-    [SerializeField] public string fishName;
-    [SerializeField] public FishType fishType;
-    [SerializeField] public Color fishColor = Color.red;
+    public string fishName;
+    public FishType fishType;
+    public Color fishColor = Color.red;
 
     [Header("Movement Settings")]
-    [SerializeField] public Vector3 startPosition;
-    [SerializeField] public float speed = 2f;
-    [SerializeField] public float acceleration = 1f;
-    [SerializeField] public float deceleration = 1f; // How fast it slows
-    [SerializeField] public float turnSpeed = 90f; // Degrees per second
+    public Vector3 startPosition;
+    public float speed = 2f;
+    public float deceleration = 1f; // How fast it slows
+    public float turnSpeed = 90f; // Degrees per second
+    public float acceleration = 1f;
 
     [Header("AI Settings")]
-    [SerializeField] public float wanderRadius = 5f; // Radius for choosing random wander targets around the fish's current position
-    [SerializeField] public float wanderInterval = 10f; // Time in seconds between choosing new wander target
-    [SerializeField] public float fleeTime = 2f; // Time in seconds to flee after player or bait is detected
-    [SerializeField] public float detectionRadius = 5f; // Radius in which it will react to the player or their bait
-    [SerializeField] public float fleeSpeedMultiplier = 1.5f; // Multiplier for speed when fleeing from player or bait
-    [SerializeField] public LayerMask layerMask;
+    public float wanderInterval = 10f; // Time in seconds between choosing new wander target
+    public float fleeTime = 2f; // Time in seconds to flee after player or bait is detected
+    public float detectionRadius = 5f; // Radius in which it will react to the player or their bait
+    public float fleeSpeedMultiplier = 1.5f; // Multiplier for speed when fleeing from player or bait
+    public LayerMask layerMask;
+    public float wanderRadius = 5f; // Radius for choosing random wander targets around the fish's current position
 
     [Header("Fish Stats")]
-    [SerializeField] public float health = 10f;
-    [SerializeField] public float attack = 1f;  // Damage dealt to player's rod durability per second when player marker is in red zone
-    [SerializeField] public float defense = 0f;
+    public float health = 10f;
+    public float attack = 1f;  // Damage dealt to player's rod durability per second when player marker is in red zone
+    public float defense = 0f;
 
     [Header("Debug Settings")]
     [SerializeField] private GameObject debugWanderRadiusPrefab;
@@ -177,7 +177,7 @@ public class FishAI : MonoBehaviour
             currVelocity = Mathf.Lerp(currVelocity, 0f, deceleration * Time.deltaTime);
         }
 
-        Vector3 nextPos = transform.position + transform.forward * currVelocity * Time.deltaTime;
+        Vector3 nextPos = transform.position + (transform.forward * currVelocity) * Time.deltaTime;
 
         // Check if next position is still over water
         if (Physics.Raycast(nextPos + Vector3.up * 5f, Vector3.down, 20f, layerMask))

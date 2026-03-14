@@ -3,13 +3,13 @@ using UnityEngine;
 public class Weapon : MonoBehaviour
 {
     [Header("Weapon Settings")]
-    [SerializeField] public string weaponName;
-    [SerializeField] public WeaponType weaponType;
-    [SerializeField] public float damage = 1f; // Damage dealt to target
-    [SerializeField] public float fireRate = 1f; // Amount of time in seconds damage is applied to target after firing
-    [SerializeField] public float range = 10f;
-    [SerializeField] public float castSpeed = 2f; // Time in seconds for the shot to reach max range 
-    [SerializeField] public Transform equipPoint;
+    public string weaponName;
+    public WeaponType weaponType;
+    public float damage = 1f; // Damage dealt to target
+    public float fireRate = 1f; // Amount of time in seconds damage is applied to target after firing
+    public float range = 10f;
+    public float castSpeed = 2f; // Time in seconds for the shot to reach max range 
+    public Transform equipPoint;
 
     public FishingLine fishingLine;
 
@@ -18,6 +18,12 @@ public class Weapon : MonoBehaviour
     [SerializeField] private int lineNodeCount = 25;
 
     private GameObject projectileInstance;
+    private Projectile projectileScript;
+
+    void Start()
+    {
+        projectileScript = projectileInstance.GetComponent<Projectile>();
+    }
 
     public void Fire(GameObject projectilePrefab, Vector3 cursorPosition, GameObject container)
     {
@@ -36,7 +42,6 @@ public class Weapon : MonoBehaviour
         // Spawn projectile
         projectileInstance = Instantiate(projectilePrefab, firePoint.position, Quaternion.identity);
         projectileInstance.transform.SetParent(container.transform); // Parent to container for organization
-        Projectile projectileScript = projectileInstance.GetComponent<Projectile>();
         if (projectileScript != null)
         {
             projectileScript.LaunchInArc(cursorPosition, castSpeed);
@@ -48,7 +53,7 @@ public class Weapon : MonoBehaviour
 
     private void SpawnFishingLine(Transform target)
     {
-        GameObject lineObj = new GameObject("FishingLine");
+        GameObject lineObj = new("FishingLine");
         fishingLine = lineObj.AddComponent<FishingLine>();
         fishingLine.Initialize(firePoint, target, lineNodeCount);
     }
