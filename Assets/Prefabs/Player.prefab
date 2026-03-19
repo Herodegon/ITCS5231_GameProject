@@ -285,8 +285,9 @@ MonoBehaviour:
   weaponManager: {fileID: 1356943215472578528}
   fishHooked: {fileID: 0}
   tetherRange: 10
-  tetherSpeedMult: 1.5
-  tetherAccelerationMult: 2
+  hp: 100
+  attack: 1
+  pullStrength: 1
   showVelocity: 1
   velocityDebugScale: 1
 --- !u!54 &9014544864817556605

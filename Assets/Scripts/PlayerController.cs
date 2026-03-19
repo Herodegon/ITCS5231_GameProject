@@ -224,7 +224,7 @@ public class PlayerController : MonoBehaviour
 
         if (Vector3.Distance(playerPosition, fishPosition) > tetherRange)
         {
-            fishPullSpeed *= 1 + (fishPullStrength/2f); // Increase pull speed by 50% for each unit of pull strength
+            fishPullSpeed *= 1f + (fishPullStrength/2f); // Increase pull speed by 50% for each unit of pull strength
         }
         currentVelocity = Vector3.Lerp(currentVelocity, fishDirection * fishPullSpeed, acceleration * Time.fixedDeltaTime);
 
@@ -239,7 +239,8 @@ public class PlayerController : MonoBehaviour
         if (lookDir.sqrMagnitude > 0.01f)
         {
             Quaternion targetRot = Quaternion.LookRotation(lookDir);
-            playerRigidbody.MoveRotation(Quaternion.Slerp(playerRigidbody.rotation, targetRot, turnSpeed * Time.fixedDeltaTime));
+            playerRigidbody.MoveRotation(Quaternion.Slerp(
+            playerRigidbody.rotation, targetRot, turnSpeed * Time.fixedDeltaTime));
         }
     }
     #endregion
