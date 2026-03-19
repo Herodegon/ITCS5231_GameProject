@@ -36,6 +36,7 @@ public class FishAI : MonoBehaviour
     [Header("Fish Stats")]
     public float health = 10f;
     public float attack = 1f;  // Damage dealt to player's rod durability per second when player marker is in red zone
+    public float pullStrength = 1f; // Strength of the pull when the fish is within the tether range
     public float defense = 0f;
 
     [Header("Debug Settings")]
@@ -170,14 +171,15 @@ public class FishAI : MonoBehaviour
 
         if (Vector3.Distance(transform.position, targetPosition) > currVelocity)
         {
-            currVelocity = Mathf.Lerp(currVelocity, speed, acceleration * Time.deltaTime);
+            currVelocity = Mathf.Lerp(currVelocity, speed, acceleration * Time.fixedDeltaTime);
         }
         else
         {
-            currVelocity = Mathf.Lerp(currVelocity, 0f, deceleration * Time.deltaTime);
+            currVelocity = Mathf.Lerp(currVelocity, 0f, deceleration * Time.fixedDeltaTime);
         }
 
-        Vector3 nextPos = transform.position + (transform.forward * currVelocity) * Time.deltaTime;
+        float step = currVelocity * Time.fixedDeltaTime;
+        Vector3 nextPos = transform.position + transform.forward * step;
 
         // Check if next position is still over water
         if (Physics.Raycast(nextPos + Vector3.up * 5f, Vector3.down, 20f, layerMask))
@@ -198,7 +200,7 @@ public class FishAI : MonoBehaviour
         {
             Vector3 directionToTarget = (target.position - transform.position).normalized;
             Quaternion targetRotation = Quaternion.LookRotation(directionToTarget);
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, turnSpeed * Time.fixedDeltaTime);
 
             // Check if we're facing close enough to the target (within ~2 degrees)
             if (Vector3.Angle(transform.forward, directionToTarget) < 2f)

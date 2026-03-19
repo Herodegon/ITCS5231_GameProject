@@ -48,8 +48,8 @@ MonoBehaviour:
   weapon: {fileID: 6573777256686717983, guid: 3ca1f36d579f2a04eb8debd8b9d30f82, type: 3}
   projectile: {fileID: 4115626492044037021, guid: 8b93a3d5bd3b19e45b0c1482d9da4810, type: 3}
   weaponMountPoint: {fileID: 8869165702997797434}
-  trajectoryLinePoints: 16
   projectileContainer: {fileID: 0}
+  trajectoryLinePoints: 16
 --- !u!1 &6620302397150357475
 GameObject:
   m_ObjectHideFlags: 0
@@ -284,8 +284,9 @@ MonoBehaviour:
     m_Bits: 16
   weaponManager: {fileID: 1356943215472578528}
   fishHooked: {fileID: 0}
-  tetherStrafeSpeed: 2
-  tetherStrafePercent: 0.3
+  tetherRange: 10
+  tetherSpeedMult: 1.5
+  tetherAccelerationMult: 2
   showVelocity: 1
   velocityDebugScale: 1
 --- !u!54 &9014544864817556605
@@ -313,7 +314,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 80
+  m_Constraints: 84
   m_CollisionDetection: 0
 --- !u!1001 &1636748195483973509
 PrefabInstance:

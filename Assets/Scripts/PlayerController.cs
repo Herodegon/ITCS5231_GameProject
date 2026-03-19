@@ -23,10 +23,13 @@ public class PlayerController : MonoBehaviour
     [Header("Combat Settings")]
     public WeaponManager weaponManager;
     public GameObject fishHooked;
-    [SerializeField] private float tetherStrafeSpeed = 2f;
-    [SerializeField] private float tetherStrafePercent = 0.3f;
-    private float tetherAngle = 0f;  // Angle around the fish to strafe updated in runtime
+    public float tetherRange = 10f; // Max radius from player to fish before it starts to pull the player towards it
     private PlayerState playerState = PlayerState.Moving;
+    
+    [Header("Player Stats")]
+    public float hp = 100f;
+    public float attack = 1f; // Damage dealt to fish's health per second when player marker is in green zone
+    public float pullStrength = 1f; // Strength of the pull when the player is within the tether range
 
     [Header("Debug Settings")]
     [SerializeField] private bool showVelocity = false;
@@ -171,7 +174,7 @@ public class PlayerController : MonoBehaviour
         {
             float turnAmount = movementInput.x * turnSpeed * Time.fixedDeltaTime;
             Quaternion turnRotation = Quaternion.Euler(0f, turnAmount, 0f);
-            transform.rotation = transform.rotation * turnRotation;
+            playerRigidbody.MoveRotation(playerRigidbody.rotation * turnRotation);
         }
 
         // Gradually turn the velocity direction toward where boat is facing (drift effect)
@@ -194,7 +197,7 @@ public class PlayerController : MonoBehaviour
         if (Mathf.Abs(forwardInput) > 0.1f)
         {
             // Accelerate in the direction the boat is facing
-            Vector3 targetVelocity = (transform.forward * forwardInput) * moveSpeed;
+            Vector3 targetVelocity = transform.forward * (forwardInput * moveSpeed);
             currentVelocity = Vector3.Lerp(currentVelocity, targetVelocity, acceleration * Time.fixedDeltaTime);
         }
         else
@@ -210,30 +213,22 @@ public class PlayerController : MonoBehaviour
     private void UpdateTetheredMovement()
     {
         if (fishHooked == null) return;
+        float fishPullStrength = fishHooked.GetComponent<FishAI>().pullStrength;
+        float fishPullSpeed = moveSpeed;
+        float strafe = movementInput.x;
+        float back = Mathf.Clamp01(-movementInput.y);
 
-        // Update tether angle based on horizontal input
-        if (Mathf.Abs(movementInput.x) > 0.1f)
+        Vector3 fishPosition = fishHooked.transform.position;
+        Vector3 playerPosition = playerRigidbody.position;
+        Vector3 fishDirection = (fishPosition - playerPosition).normalized;
+
+        if (Vector3.Distance(playerPosition, fishPosition) > tetherRange)
         {
-            tetherAngle += movementInput.x * tetherStrafeSpeed * Time.fixedDeltaTime;
+            fishPullSpeed *= 1 + (fishPullStrength/2f); // Increase pull speed by 50% for each unit of pull strength
         }
+        currentVelocity = Vector3.Lerp(currentVelocity, fishDirection * fishPullSpeed, acceleration * Time.fixedDeltaTime);
 
-        // Calculate new position in a circle around the fish
-        Vector3 offset = new Vector3(Mathf.Sin(tetherAngle), 0f, Mathf.Cos(tetherAngle)) * tetherStrafePercent;
-        Vector3 targetPosition = fishHooked.transform.position + offset;
-
-        // Move towards the target position around the fish
-        Vector3 moveDirection = (targetPosition - playerRigidbody.position).normalized;
-
-        if (Vector3.Distance(playerRigidbody.position, targetPosition) > 10f)
-        {
-            currentVelocity = Vector3.Lerp(currentVelocity, moveDirection * (moveSpeed * 1.5f), 10f * Time.fixedDeltaTime);
-        }
-        else
-        {
-            currentVelocity = Vector3.Lerp(currentVelocity, moveDirection * moveSpeed, acceleration * Time.fixedDeltaTime);
-        }
-
-        playerRigidbody.MovePosition(playerRigidbody.position + currentVelocity * Time.fixedDeltaTime);
+        playerRigidbody.MovePosition(playerPosition + currentVelocity * Time.fixedDeltaTime);
     }
 
     private void UpdateTetheredRotation()
@@ -243,11 +238,8 @@ public class PlayerController : MonoBehaviour
         lookDir.y = 0;
         if (lookDir.sqrMagnitude > 0.01f)
         {
-            transform.rotation = Quaternion.Slerp(
-                transform.rotation,
-                Quaternion.LookRotation(lookDir),
-                turnSpeed * Time.fixedDeltaTime
-            );
+            Quaternion targetRot = Quaternion.LookRotation(lookDir);
+            playerRigidbody.MoveRotation(Quaternion.Slerp(playerRigidbody.rotation, targetRot, turnSpeed * Time.fixedDeltaTime));
         }
     }
     #endregion

@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
+[RequireComponent(typeof(Collider))]
 public class Projectile : MonoBehaviour
 {
     public static System.Action<GameObject> OnFishHitEvent;

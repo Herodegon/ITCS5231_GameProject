@@ -10,7 +10,6 @@ public class Weapon : MonoBehaviour
     public float range = 10f;
     public float castSpeed = 2f; // Time in seconds for the shot to reach max range 
     public Transform equipPoint;
-
     public FishingLine fishingLine;
 
     [Header("References")]
@@ -18,12 +17,6 @@ public class Weapon : MonoBehaviour
     [SerializeField] private int lineNodeCount = 25;
 
     private GameObject projectileInstance;
-    private Projectile projectileScript;
-
-    void Start()
-    {
-        projectileScript = projectileInstance.GetComponent<Projectile>();
-    }
 
     public void Fire(GameObject projectilePrefab, Vector3 cursorPosition, GameObject container)
     {
@@ -34,15 +27,15 @@ public class Weapon : MonoBehaviour
             cursorPosition = firePoint.position + (cursorPosition - firePoint.position).normalized * range;
         }
 
-         // Clean up any existing cast
-
         // Clean up any existing cast
         CleanUpCast();
 
         // Spawn projectile
         projectileInstance = Instantiate(projectilePrefab, firePoint.position, Quaternion.identity);
         projectileInstance.transform.SetParent(container.transform); // Parent to container for organization
-        if (projectileScript != null)
+
+        // If the projectile has a Projectile script, launch it in an arc
+        if (projectileInstance.TryGetComponent(out Projectile projectileScript))
         {
             projectileScript.LaunchInArc(cursorPosition, castSpeed);
         }
