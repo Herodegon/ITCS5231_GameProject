@@ -3,28 +3,41 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.EventSystems;
 
-public class upgradeSlot : MonoBehaviour
+public class upgradeSlot : MonoBehaviour, IPointerClickHandler
 {
     //Item Data
     public string itemName;
-    public int quantity;
     public Sprite itemSprite;
     public bool isFull;
 
     //Item Slot
-    [SerializeField] private TMP_Text quantityText;
     [SerializeField] private Image itemImage;
+    public GameObject selectedImage;
+    public bool selected;
+    private PauseMenu inventoryManager;
 
-    public void addUpgrade(string name, int quantity, Sprite sprite)
+    private void Start()
+    {
+        inventoryManager = GameObject.Find("PauseMenu").GetComponent<PauseMenu>();
+    }
+
+    public void addUpgrade(string name, Sprite sprite)
     {
         this.name = name;
-        this.quantity = quantity;
         this.itemSprite = sprite;
         isFull = true;
 
-        quantityText.text = quantity.ToString();
-        quantityText.enabled = true;
         itemImage.sprite = sprite;
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if(eventData.button == PointerEventData.InputButton.Left){
+            inventoryManager.deselectUpgrade();
+            selectedImage.SetActive(true);
+            selected = true;
+        }
     }
 }

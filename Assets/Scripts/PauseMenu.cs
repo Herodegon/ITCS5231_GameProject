@@ -33,6 +33,8 @@ public class PauseMenu : MonoBehaviour
             {
                 pause();
             }
+        }else if(Keyboard.current.qKey.wasPressedThisFrame){
+            removeFish();
         }
     }
 
@@ -53,6 +55,8 @@ public class PauseMenu : MonoBehaviour
         paused = false;
     }
 
+    #region fish inventory
+    /* add a fish to the inventory */
     public void addFish(string name, int quantity, Sprite sprite)
     {
         for (int i = 0; i < fishSlot.Length; i++)
@@ -65,10 +69,39 @@ public class PauseMenu : MonoBehaviour
         }
     }
 
-    public void addUpgrade(string name, int quantity, Sprite sprite, int type)
+    /* deselect the selected slot before selecting a new one */
+    public void deselectFish()
     {
-        upgradeSlot[type].addUpgrade(name, quantity, sprite);
+        for(int i = 0; i < fishSlot.Length; i++){
+            fishSlot[i].selectedImage.SetActive(false);
+            fishSlot[i].selected = false;
+        }
     }
+
+    public void removeFish()
+    {
+        for(int i = 0; i < fishSlot.Length; i++){
+            if(fishSlot[i].selected){
+                fishSlot[i].removeFish();
+                return;
+            }
+        }
+    }
+    #endregion
+
+    #region upgrade inventory
+    public void addUpgrade(string name, Sprite sprite, int type)
+    {
+        upgradeSlot[type].addUpgrade(name, sprite);
+    }
+
+    public void deselectUpgrade(){
+        for(int i = 0; i < upgradeSlot.Length; i++){
+            upgradeSlot[i].selectedImage.SetActive(false);
+            upgradeSlot[i].selected = false;
+        }
+    }
+    #endregion
 
     public void mapButton()
     {

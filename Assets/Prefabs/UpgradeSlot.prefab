@@ -195,7 +195,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.02745098, g: 0.8039216, b: 0, a: 1}
+  m_Color: {r: 0, g: 1, b: 0.92302203, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -308,7 +308,9 @@ MonoBehaviour:
   itemSprite: {fileID: 0}
   isFull: 0
   quantityText: {fileID: 0}
-  itemImage: {fileID: 0}
+  itemImage: {fileID: 8479803120448505530}
+  selectedImage: {fileID: 6623930259933851471}
+  selected: 0
 --- !u!1 &8686629288895736162
 GameObject:
   m_ObjectHideFlags: 0

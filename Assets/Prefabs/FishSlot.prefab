@@ -270,7 +270,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.02869066, g: 0.8037735, b: 0, a: 0.392}
+  m_Color: {r: 0, g: 1, b: 0.8267751, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -384,3 +384,5 @@ MonoBehaviour:
   isFull: 0
   quantityText: {fileID: 260126130080889905}
   itemImage: {fileID: 2739226517404437155}
+  selectedImage: {fileID: 6041308755606754819}
+  selected: 0
