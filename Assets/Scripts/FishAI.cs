@@ -165,11 +165,14 @@ public class FishAI : MonoBehaviour
 
     private void MoveTowards(Vector3 targetPosition = default)
     {
+        float distanceToTarget = Vector3.Distance(transform.position, targetPosition);
+        if (distanceToTarget < 0.01f) return;
+
         Vector3 directionToTarget = (targetPosition - transform.position).normalized;
         Quaternion targetRotation = Quaternion.LookRotation(directionToTarget);
         transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);
 
-        if (Vector3.Distance(transform.position, targetPosition) > currVelocity)
+        if (distanceToTarget > currVelocity)
         {
             currVelocity = Mathf.Lerp(currVelocity, speed, acceleration * Time.fixedDeltaTime);
         }
@@ -222,8 +225,8 @@ public class FishAI : MonoBehaviour
             baitTarget = other.transform;
             distToTarget = Vector3.Distance(transform.position, baitTarget.position);
             fishState = FishState.Interested;
-            StartCoroutine(LookAtTarget(baitTarget));
-            return;
+            lookAtTargetCoroutine = StartCoroutine(LookAtTarget(baitTarget));
+            wanderTarget = transform.position;
         }
     }
 
@@ -237,8 +240,8 @@ public class FishAI : MonoBehaviour
             baitTarget = other.transform;
             distToTarget = Vector3.Distance(transform.position, baitTarget.position);
             fishState = FishState.Interested;
-            StartCoroutine(LookAtTarget(baitTarget));
-            return;
+            lookAtTargetCoroutine = StartCoroutine(LookAtTarget(baitTarget));
+            wanderTarget = transform.position;
         }
     }
 

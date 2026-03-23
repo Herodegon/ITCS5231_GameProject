@@ -215,6 +215,7 @@ public class PlayerController : MonoBehaviour
         if (fishHooked == null) return;
         float fishPullStrength = fishHooked.GetComponent<FishAI>().pullStrength;
         float fishPullSpeed = moveSpeed;
+        float fishPullAcceleration = acceleration;
         float strafe = movementInput.x;
         float back = Mathf.Clamp01(-movementInput.y);
 
@@ -222,11 +223,21 @@ public class PlayerController : MonoBehaviour
         Vector3 playerPosition = playerRigidbody.position;
         Vector3 fishDirection = (fishPosition - playerPosition).normalized;
 
-        if (Vector3.Distance(playerPosition, fishPosition) > tetherRange)
+        float distanceToFish = Vector3.Distance(playerPosition, fishPosition);
+        if (distanceToFish >= tetherRange)
         {
-            fishPullSpeed *= 1f + (fishPullStrength/2f); // Increase pull speed by 50% for each unit of pull strength
+            // "Tautness" ramps up quickly once the tether starts to pull.
+            float tautOver = distanceToFish - tetherRange;
+            float tautRampDistance = Mathf.Max(0.01f, tetherRange * 0.3f);
+            float taut01 = Mathf.Clamp01(tautOver / tautRampDistance);
+            taut01 = Mathf.SmoothStep(0f, 1f, taut01);
+
+            // Start pulling at tetherRange, then strengthen as the line stretches further.
+            fishPullSpeed *= 1f + fishPullStrength * 0.5f * taut01;
+            fishPullAcceleration *= 1f + fishPullStrength * 0.5f * taut01;
         }
-        currentVelocity = Vector3.Lerp(currentVelocity, fishDirection * fishPullSpeed, acceleration * Time.fixedDeltaTime);
+        float lerpT = fishPullAcceleration * Time.fixedDeltaTime;
+        currentVelocity = Vector3.Lerp(currentVelocity, fishDirection * fishPullSpeed, Mathf.Clamp01(lerpT));
 
         playerRigidbody.MovePosition(playerPosition + currentVelocity * Time.fixedDeltaTime);
     }
