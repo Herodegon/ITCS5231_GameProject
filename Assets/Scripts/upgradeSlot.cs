@@ -36,6 +36,7 @@ public class upgradeSlot : MonoBehaviour, IPointerClickHandler
     {
         if(eventData.button == PointerEventData.InputButton.Left){
             inventoryManager.deselectUpgrade();
+            inventoryManager.deselectFish();
             selectedImage.SetActive(true);
             selected = true;
         }

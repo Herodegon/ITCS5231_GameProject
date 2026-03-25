@@ -8,18 +8,18 @@ public class MapMaker : MonoBehaviour
     [SerializeField] GameObject node;
 
     // Update is called once per frame
-    void Update()
+    void Awake()
+    {
+        fillStartNode();
+    }
+
+    public void fillStartNode()
     {
         
     }
 
-    void fillStartNode()
+    public void createNextNode(Vector3 pos, Quaternion rot)
     {
-        
-    }
-
-    void createNextNodes()
-    {
-        Instantiate(node, transform.position, Quaternion.identity);
+        Object.Instantiate(node, pos, rot);
     }
 }
