@@ -6,11 +6,19 @@ using UnityEngine.UI;
 public class MapMaker : MonoBehaviour
 {
     [SerializeField] GameObject node;
+    [SerializeField] GameObject map;
 
-    // Update is called once per frame
-    void Awake()
+    public void makeMap(int cols, int[] rows)
     {
-        fillStartNode();
+        int nodeCount = 1;
+        for (int i = 0; i < cols; i++)
+        {
+            for (int j = 0; j < rows[i]; j++)
+            {
+                createNextNode(nodeCount);
+                nodeCount++;
+            }
+        }
     }
 
     public void fillStartNode()
@@ -18,8 +26,9 @@ public class MapMaker : MonoBehaviour
         
     }
 
-    public void createNextNode(Vector3 pos, Quaternion rot)
+    public void createNextNode(int nodeNum)
     {
-        Object.Instantiate(node, pos, rot);
+        GameObject nextNode = Instantiate(node, map.transform);
+        nextNode.transform.localPosition = new Vector3(-660, 0, 0);
     }
 }

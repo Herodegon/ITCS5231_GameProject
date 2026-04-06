@@ -61,7 +61,13 @@ public class PauseMenu : MonoBehaviour
     {
         for (int i = 0; i < fishSlot.Length; i++)
         {
-            if (fishSlot[i].isFull == false)
+            if(fishSlot[i].name == name)
+            {
+                quantity += fishSlot[i].quantity;
+                fishSlot[i].addFish(name, quantity, sprite);
+                return;
+            }
+            else if (fishSlot[i].isFull == false)
             {
                 fishSlot[i].addFish(name, quantity, sprite);
                 return;
@@ -108,6 +114,9 @@ public class PauseMenu : MonoBehaviour
         inventory.SetActive(false);
         settings.SetActive(false);
         map.SetActive(true);
+        int cols = 5;
+        int[] rows = new int[] { 1, 3, 2, 2, 1 };
+        map.GetComponent<MapMaker>().makeMap(cols, rows);
     }
 
     public void settingsButton()

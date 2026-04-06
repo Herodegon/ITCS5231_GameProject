@@ -1439,6 +1439,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NewMonoBehaviourScript
   node: {fileID: 1071520738}
+  map: {fileID: 1231407132}
 --- !u!114 &1273607287 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8257213327233831271, guid: 4008daac2bb2c924aaa8b3e1f808d933, type: 3}
