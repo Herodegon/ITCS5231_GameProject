@@ -13,8 +13,8 @@ public class Bar : MonoBehaviour
 
     void Start()
     {
-        healthUI.transform.Translate(215.0f, 75.0f, 0.0f);
-        fuelUI.transform.Translate(215.0f, 130.0f, 0.0f);
+        healthUI.transform.Translate(150.0f, 50.0f, 0.0f);
+        fuelUI.transform.Translate(150.0f, 90.0f, 0.0f);
     }
 
     public void setMaxBar(int value, bool health)
