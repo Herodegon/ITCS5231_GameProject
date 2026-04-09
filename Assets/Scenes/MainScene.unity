@@ -579,6 +579,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 843977739578708051, guid: d5621fa6af8c9114593d512dc453423b, type: 3}
+      propertyPath: m_text
+      value: 100
+      objectReference: {fileID: 0}
     - target: {fileID: 1699352591895526704, guid: d5621fa6af8c9114593d512dc453423b, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -618,6 +622,10 @@ PrefabInstance:
     - target: {fileID: 1699352591895526704, guid: d5621fa6af8c9114593d512dc453423b, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5113247007570957377, guid: d5621fa6af8c9114593d512dc453423b, type: 3}
+      propertyPath: far clip plane
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 5332230651229773539, guid: d5621fa6af8c9114593d512dc453423b, type: 3}
       propertyPath: m_IsActive
