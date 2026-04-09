@@ -18,7 +18,6 @@ public class fishBarCreator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        fishBar.transform.Translate(0.0f, 100.0f, 0.0f);
         isBarOn = false;
         fishBar.SetActive(false);
     }
