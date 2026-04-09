@@ -22,7 +22,7 @@ public class fishSlot : MonoBehaviour, IPointerClickHandler
 
     private void Start()
     {
-        inventoryManager = GameObject.Find("PauseMenu").GetComponent<PauseMenu>();
+        inventoryManager = GameObject.Find("CanvasUI").GetComponent<PauseMenu>();
     }
 
     public void addFish(string name, int quantity, Sprite sprite)
