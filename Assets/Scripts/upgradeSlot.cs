@@ -20,7 +20,7 @@ public class upgradeSlot : MonoBehaviour, IPointerClickHandler
 
     private void Start()
     {
-        inventoryManager = GameObject.Find("PauseMenu").GetComponent<PauseMenu>();
+        inventoryManager = GameObject.Find("CanvasUI").GetComponent<PauseMenu>();
     }
 
     public void addUpgrade(string name, Sprite sprite)
