@@ -399,6 +399,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.InputActionReference
   m_Asset: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_ActionId: 32b35790-4ed0-4e9a-aa41-69ac6d629449
+--- !u!20 &1073730647 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 5113247007570957377, guid: d5621fa6af8c9114593d512dc453423b, type: 3}
+  m_PrefabInstance: {fileID: 218068175165119380}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1222737999
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -413,6 +418,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.InputActionReference
   m_Asset: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_ActionId: 15cef263-9014-4fd5-94d9-4e4a6234a6ef
+--- !u!114 &1425794126 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8813182609779212842, guid: d5621fa6af8c9114593d512dc453423b, type: 3}
+  m_PrefabInstance: {fileID: 218068175165119380}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01614664b831546d2ae94a42149d80ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.UI.InputSystemUIInputModule
 --- !u!114 &1568517458
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -586,6 +602,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 216261445023352963, guid: d5621fa6af8c9114593d512dc453423b, type: 3}
+      propertyPath: m_Camera
+      value: 
+      objectReference: {fileID: 1073730647}
+    - target: {fileID: 216261445023352963, guid: d5621fa6af8c9114593d512dc453423b, type: 3}
+      propertyPath: m_UIInputModule
+      value: 
+      objectReference: {fileID: 1425794126}
     - target: {fileID: 297968650194566767, guid: d5621fa6af8c9114593d512dc453423b, type: 3}
       propertyPath: m_Colors.m_HighlightedColor.a
       value: 0
@@ -1126,6 +1150,30 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5511294308909996074, guid: d5621fa6af8c9114593d512dc453423b, type: 3}
+      propertyPath: pauseAction.m_Name
+      value: Pause
+      objectReference: {fileID: 0}
+    - target: {fileID: 5511294308909996074, guid: d5621fa6af8c9114593d512dc453423b, type: 3}
+      propertyPath: pauseAction.m_SingletonActionBindings.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5511294308909996074, guid: d5621fa6af8c9114593d512dc453423b, type: 3}
+      propertyPath: pauseAction.m_SingletonActionBindings.Array.data[0].m_Id
+      value: 91d06451-dfbe-4a86-a7fa-d651788b9be2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5511294308909996074, guid: d5621fa6af8c9114593d512dc453423b, type: 3}
+      propertyPath: pauseAction.m_SingletonActionBindings.Array.data[0].m_Path
+      value: <Keyboard>/escape
+      objectReference: {fileID: 0}
+    - target: {fileID: 5511294308909996074, guid: d5621fa6af8c9114593d512dc453423b, type: 3}
+      propertyPath: pauseAction.m_SingletonActionBindings.Array.data[0].m_Action
+      value: Pause
+      objectReference: {fileID: 0}
+    - target: {fileID: 5511294308909996074, guid: d5621fa6af8c9114593d512dc453423b, type: 3}
+      propertyPath: pauseAction.m_SingletonActionBindings.Array.data[0].m_Interactions
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 6076361418361610856, guid: d5621fa6af8c9114593d512dc453423b, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -1225,6 +1273,10 @@ PrefabInstance:
     - target: {fileID: 6753352149454649796, guid: d5621fa6af8c9114593d512dc453423b, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6888020880336542170, guid: d5621fa6af8c9114593d512dc453423b, type: 3}
+      propertyPath: tetherRange
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 7543326851022036531, guid: d5621fa6af8c9114593d512dc453423b, type: 3}
       propertyPath: m_AnchorMax.y
@@ -1358,6 +1410,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -362.8
       objectReference: {fileID: 0}
+    - target: {fileID: 8612234498299165378, guid: d5621fa6af8c9114593d512dc453423b, type: 3}
+      propertyPath: pauseMenu
+      value: 
+      objectReference: {fileID: 1623027614}
     - target: {fileID: 8813182609779212842, guid: d5621fa6af8c9114593d512dc453423b, type: 3}
       propertyPath: m_MoveAction
       value: 

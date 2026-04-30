@@ -125,6 +125,20 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void OnPause(bool paused)
+    {
+        inputActions.Disable();
+        switch(paused)
+        {
+            case true:
+                inputActions.FindActionMap("UI").Enable();
+                break;
+            case false:
+                inputActions.FindActionMap("Player").Enable();
+                break;
+        }
+    }
+
     #endregion
 
     #region Physics and Movement

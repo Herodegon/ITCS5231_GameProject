@@ -1,11 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.InputSystem;
 
 public class PauseMenu : MonoBehaviour
 {
+    public static event Action<bool> OnPauseEvent;
+    
+    [Header("UI Elements")]
     public GameObject pauseMenu;
     public GameObject map;
     public GameObject inventory;
@@ -14,16 +15,19 @@ public class PauseMenu : MonoBehaviour
     public fishSlot[] fishSlot;
     public upgradeSlot[] upgradeSlot;
 
+    [SerializeField] private InputAction pauseAction;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         unpause();
+        pauseAction.Enable();
+        pauseAction.performed += OnPauseActionPerformed;
     }
 
-    // Update is called once per frame
-    void Update()
+    void OnPauseActionPerformed(InputAction.CallbackContext context)
     {
-        if (Keyboard.current.escapeKey.wasPressedThisFrame)
+        if (context.ReadValue<float>() == 1)
         {
             if (paused)
             {
@@ -33,8 +37,7 @@ public class PauseMenu : MonoBehaviour
             {
                 pause();
             }
-        }else if(Keyboard.current.qKey.wasPressedThisFrame){
-            removeFish();
+            OnPauseEvent?.Invoke(paused);
         }
     }
 

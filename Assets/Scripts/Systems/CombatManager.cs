@@ -6,6 +6,7 @@ public class CombatManager : MonoBehaviour
     public GameObject player;
     public GameObject fishTarget;
     public PopupManager popupManager;
+    public PauseMenu pauseMenu;
 
     private PlayerController playerController;
     private WeaponManager weaponManager;
@@ -24,6 +25,7 @@ public class CombatManager : MonoBehaviour
         cameraController = Camera.main != null ? Camera.main.GetComponent<CameraController>() : null;
 
         Projectile.OnFishHitEvent += OnFishHit;
+        PauseMenu.OnPauseEvent += OnPause;
 
         if (fishTarget != null)
         {
@@ -37,6 +39,11 @@ public class CombatManager : MonoBehaviour
         return;
     }
 
+    public void OnPause(bool paused)
+    {
+        playerController.OnPause(paused);
+    }
+
     public void OnFishHit(GameObject fish)
     {
         if (fish == null || playerController == null) return;
@@ -48,7 +55,7 @@ public class CombatManager : MonoBehaviour
 
         playerController.EnterCombat(fishTarget);
         fishAI.EnterCombat();
-        cameraController?.EnterCombatView(player.transform, fishTarget.transform);
+        cameraController.EnterCombatView(player.transform, fishTarget.transform);
         StartCoroutine(DealDamageToFish());
     }
 
@@ -58,14 +65,14 @@ public class CombatManager : MonoBehaviour
         {
             float damage = weaponManager.CalculateDamage();
             fishAI.TakeDamage(damage);
-            popupManager?.GenDamagePopup(damage, fishTarget.transform.position);
+            popupManager.GenDamagePopup(damage, fishTarget.transform.position);
             if (fishAI.isCaptured)
             {
                 break;
             }
             yield return new WaitForSeconds(weaponManager.CalculateFireRate());
         }
-        cameraController?.ExitCombatView();
+        cameraController.ExitCombatView();
         if (playerController != null && playerController.fishHooked != null)
         {
             playerController.ExitCombat();

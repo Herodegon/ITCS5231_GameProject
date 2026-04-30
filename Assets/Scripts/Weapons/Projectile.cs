@@ -1,10 +1,11 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(Collider))]
 public class Projectile : MonoBehaviour
 {
-    public static System.Action<GameObject> OnFishHitEvent;
+    public static event Action<GameObject> OnFishHitEvent;
 
     [Header("Projectile Settings")]
     public Vector3 hitboxSize = new(0.5f,0.5f,0.5f);
