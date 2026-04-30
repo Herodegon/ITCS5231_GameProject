@@ -635,6 +635,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: CombatManager
       objectReference: {fileID: 0}
+    - target: {fileID: 7344904221410449076, guid: d5621fa6af8c9114593d512dc453423b, type: 3}
+      propertyPath: health
+      value: 100
+      objectReference: {fileID: 0}
     - target: {fileID: 8813182609779212842, guid: d5621fa6af8c9114593d512dc453423b, type: 3}
       propertyPath: m_MoveAction
       value: 
