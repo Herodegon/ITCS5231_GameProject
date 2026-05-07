@@ -11,11 +11,20 @@ public class MapMaker : MonoBehaviour
     public void makeMap(int cols, int[] rows)
     {
         int nodeCount = 1;
+        int placeX = 1400/cols;
+        int ySign = 0;
         for (int i = 0; i < cols; i++)
         {
             for (int j = 0; j < rows[i]; j++)
             {
-                createNextNode(nodeCount);
+                if(j == 1)
+                {
+                    ySign = 1;
+                }if(j == 2)
+                {
+                    ySign = -1;
+                }
+                createNextNode(nodeCount, placeX * i, ySign);
                 nodeCount++;
             }
         }
@@ -26,9 +35,9 @@ public class MapMaker : MonoBehaviour
         
     }
 
-    public void createNextNode(int nodeNum)
+    public void createNextNode(int nodeNum, int x, int y)
     {
         GameObject nextNode = Instantiate(node, map.transform);
-        nextNode.transform.localPosition = new Vector3(-660, 0, 0);
+        nextNode.transform.localPosition = new Vector3(-660 + x, 100 * y, 0);
     }
 }
