@@ -50,7 +50,7 @@ MonoBehaviour:
   weaponName: Grandpa's Rod
   weaponType: 0
   damage: 1
-  fireRate: 1
+  fireRate: 4
   range: 10
   castSpeed: 0.75
   equipPoint: {fileID: 2126059808341346052}

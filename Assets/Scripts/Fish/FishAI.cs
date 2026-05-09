@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 enum FishState
@@ -40,6 +41,9 @@ public class FishAI : MonoBehaviour
     public float defense = 0f;
     public bool isCaptured = false;
 
+    [Header("Destruction Settings")]
+    [SerializeField] private AnimationCurve scaleCurve;
+
     [Header("Debug Settings")]
     [SerializeField] private GameObject debugWanderRadiusPrefab;
     [SerializeField] private GameObject debugDetectionRadiusPrefab;
@@ -51,7 +55,6 @@ public class FishAI : MonoBehaviour
     private float distToTarget;
     private Coroutine lookAtTargetCoroutine;
     private float wanderTimer = 0f;
-    private float fleeTimer = 0f;
 
     private FishState fishState = FishState.Wandering;
     private SphereCollider detectionCollider;
@@ -127,6 +130,18 @@ public class FishAI : MonoBehaviour
     public void Destroy()
     {
         Debug.Log("Fish destroyed: " + fishName);
+    }
+
+    public IEnumerator FadeOutFish(float fadeOutDuration)
+    {
+        float elapsedTime = 0f;
+        while (elapsedTime < fadeOutDuration)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = elapsedTime / fadeOutDuration;
+            transform.localScale = new Vector3(scaleCurve.Evaluate(t), scaleCurve.Evaluate(t), scaleCurve.Evaluate(t));
+            yield return null;
+        }
         Destroy(gameObject);
     }
 
@@ -159,7 +174,7 @@ public class FishAI : MonoBehaviour
                     Vector3 directionToBait = (baitTarget.position - transform.position).normalized;
                     float hesitationDistance = distToTarget * Random.Range(0.15f, 0.3f); // Randomize hesitation between 15% and 30% of the total travel distance
                     wanderTarget = transform.position + directionToBait * hesitationDistance;
-                    wanderTimer = wanderInterval * 1.2f;
+                    wanderTimer = wanderInterval * 0.65f;
                     if (Vector3.Angle(transform.forward, directionToBait) > 5f) // Only do hesitation if not already mostly facing the bait
                     {
                         lookAtTargetCoroutine = StartCoroutine(LookAtTarget(baitTarget));

@@ -19,7 +19,9 @@ public class HelperClass
 
     public static LineRenderer InitRenderLine(GameObject parent, int points, float width = 0.05f)
     {
-        LineRenderer line = parent.AddComponent<LineRenderer>();
+        GameObject lineObject = new GameObject("Line");
+        lineObject.transform.SetParent(parent.transform);
+        LineRenderer line = lineObject.AddComponent<LineRenderer>();
         line.positionCount = points;
         line.startWidth = width;
         line.endWidth = width;

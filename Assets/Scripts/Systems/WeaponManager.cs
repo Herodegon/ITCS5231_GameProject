@@ -22,6 +22,7 @@ public class WeaponManager : MonoBehaviour
 
         // Create LineRenderer for trajectory visualization
         trajectoryLine = HelperClass.InitRenderLine(gameObject, trajectoryLinePoints);
+        trajectoryLine.enabled = false;
     }
 
     public void UseWeapon(Vector3 cursorPosition)
@@ -42,7 +43,7 @@ public class WeaponManager : MonoBehaviour
     {
         // Fire rate calculation based on weapon type, stats, and modifiers
         // TODO: Implement fire rate calculation logic
-        return weaponScript.fireRate;
+        return 1f / weaponScript.fireRate;
     }
 
     public void AddItem(string itemType, GameObject itemPrefab)

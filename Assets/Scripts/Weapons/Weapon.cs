@@ -6,7 +6,7 @@ public class Weapon : MonoBehaviour
     public string weaponName;
     public WeaponType weaponType;
     public float damage = 1f; // Damage dealt to target
-    public float fireRate = 1f; // Amount of time in seconds damage is applied to target after firing
+    public float fireRate = 1f; // Amount of hits per second
     public float range = 10f;
     public float castSpeed = 2f; // Time in seconds for the shot to reach max range 
     public Transform equipPoint;

@@ -165,10 +165,9 @@ MonoBehaviour:
   fishColor: {r: 1, g: 0, b: 0, a: 1}
   startPosition: {x: 0, y: 0, z: 0}
   speed: 2
-  acceleration: 1
   deceleration: 1
   turnSpeed: 90
-  wanderRadius: 5
+  acceleration: 1
   wanderInterval: 5
   fleeTime: 2
   detectionRadius: 5
@@ -176,9 +175,46 @@ MonoBehaviour:
   layerMask:
     serializedVersion: 2
     m_Bits: 16
-  health: 10
+  wanderRadius: 5
+  health: 40
   attack: 1
+  pullStrength: 1
   defense: 0
+  isCaptured: 0
+  scaleCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 136
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.15
+      value: 1.5
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 136
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 136
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  fadeOutDuration: 0.7
   debugWanderRadiusPrefab: {fileID: 3849052142641825077}
   debugDetectionRadiusPrefab: {fileID: 5267079863510057639}
   debugTargetPrefab: {fileID: 287469054601875172}

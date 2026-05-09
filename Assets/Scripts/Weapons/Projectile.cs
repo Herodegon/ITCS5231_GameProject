@@ -1,10 +1,11 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(Collider))]
 public class Projectile : MonoBehaviour
 {
-    public static System.Action<GameObject> OnFishHitEvent;
+    public static event Action<GameObject> OnFishHitEvent;
 
     [Header("Projectile Settings")]
     public Vector3 hitboxSize = new(0.5f,0.5f,0.5f);
@@ -22,13 +23,10 @@ public class Projectile : MonoBehaviour
         {
             Debug.Log("Projectile hit a fish!");
 
-            // Send message to combat manager with the hit fish to start combat
-            // SendMessageUpwards("OnFishHit", other.transform.parent.gameObject, SendMessageOptions.DontRequireReceiver);
-
             GameObject hitFish = other.transform.parent.gameObject;
             OnFishHitEvent?.Invoke(hitFish);
 
-            transform.parent = hitFish.transform;
+            transform.SetParent(hitFish.transform, false);
             if (arcMovementCoroutine != null)
             {
                 StopCoroutine(arcMovementCoroutine);

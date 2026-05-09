@@ -80,9 +80,9 @@ public class CameraController : MonoBehaviour
         transform.SetPositionAndRotation(pos, rot);
     }
 
-    private void MoveCamera(Transform targetObject)
+    private void MoveCamera(Transform targetTransform)
     {
-        Vector3 newPosition = new(targetObject.transform.position.x + cameraOffset.x, cameraOffset.y, targetObject.transform.position.z + cameraOffset.z);
+        Vector3 newPosition = new(targetTransform.position.x + cameraOffset.x, cameraOffset.y, targetTransform.position.z + cameraOffset.z);
         transform.position = Vector3.Lerp(transform.position, newPosition, Time.deltaTime * cameraFollowSpeed);
     }
 
