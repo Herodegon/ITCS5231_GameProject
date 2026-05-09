@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -12,9 +14,13 @@ enum PlayerState
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour
 {
+    public static event Action<string, int> AddFishToInventoryEvent;
+
+    [Header("Player Settings")]
     [Header("Movement Settings")]
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float acceleration = 2f;
+    [SerializeField] private float strafeAcceleration = 5f;
     [SerializeField] private float deceleration = 1f; // How fast boat slows down
     [SerializeField] private float turnSpeed = 90f; // Degrees per second
     [SerializeField] private float driftTurnRate = 0.5f; // How much velocity turns with the boat
@@ -24,6 +30,7 @@ public class PlayerController : MonoBehaviour
     public WeaponManager weaponManager;
     public GameObject fishHooked;
     public float tetherRange = 10f; // Max radius from player to fish before it starts to pull the player towards it
+    public float strafeAngle = 45f; // The +/- angle in degrees that the player can strafe relative to the fish
     private PlayerState playerState = PlayerState.Moving;
     
     [Header("Player Stats")]
@@ -34,12 +41,16 @@ public class PlayerController : MonoBehaviour
 
     [Header("Debug Settings")]
     [SerializeField] private bool showVelocity = false;
+    [SerializeField] private bool showStrafe = false;
     [SerializeField] private float velocityDebugScale = 1f;
+    [SerializeField] private float strafeDebugScale = 1f;
 
     #region Physics Variables
     private Rigidbody playerRigidbody;
     private Vector3 currentVelocity;
+    private Vector3 currentStrafeVelocity;
     private LineRenderer velocityLine;
+    private LineRenderer strafeLine;
 
     #endregion
 
@@ -62,6 +73,7 @@ public class PlayerController : MonoBehaviour
 
         // Create LineRenderer
         velocityLine = HelperClass.InitRenderLine(gameObject, 2, 0.1f);
+        strafeLine = HelperClass.InitRenderLine(gameObject, 2, 0.1f);
 
         // Initialize velocity and direction
         playerRigidbody = GetComponent<Rigidbody>();
@@ -94,6 +106,7 @@ public class PlayerController : MonoBehaviour
 
         #region Visuals
         DrawVelocityLine();
+        DrawStrafeLine();
         if (isAiming)
         {
             weaponManager.DrawTrajectory(HelperClass.GetMouseWorldPosition(Camera.main, 100f, layerMask));
@@ -153,6 +166,7 @@ public class PlayerController : MonoBehaviour
             case PlayerState.Combat:
                 UpdateTetheredRotation();
                 UpdateTetheredMovement();
+                UpdateStrafeMovement();
                 break;
         }
     }
@@ -163,7 +177,7 @@ public class PlayerController : MonoBehaviour
         playerState = PlayerState.Combat;
     }
 
-    public void ExitCombat()
+    public void ExitCombat(float destroyDelay = 1f)
     {
         FishAI fish = fishHooked.GetComponent<FishAI>();
         if (fish.isCaptured)
@@ -177,10 +191,26 @@ public class PlayerController : MonoBehaviour
             {
                 fishCaught[fishStats] = 1;
             }
+            AddFishToInventoryEvent?.Invoke(fishStats.fishName, fishCaught[fishStats]);
         }
-        fish.Destroy();
+        StartCoroutine(ReelInFish(fishHooked, destroyDelay));
+        StartCoroutine(fish.FadeOutFish(destroyDelay));
         fishHooked = null;
+        currentStrafeVelocity = Vector3.zero;
         playerState = PlayerState.Moving;
+    }
+
+    public IEnumerator ReelInFish(GameObject fish, float reelInDuration = 1f)
+    {
+        float elapsedTime = 0f;
+        while (elapsedTime < reelInDuration)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = elapsedTime / reelInDuration;
+            fish.transform.position = Vector3.Lerp(fish.transform.position, playerRigidbody.position, t * Time.fixedDeltaTime);
+            yield return null;
+        }
+        fish.GetComponent<FishAI>().Destroy();
     }
 
     private void StateMachine()
@@ -251,8 +281,6 @@ public class PlayerController : MonoBehaviour
         float fishPullStrength = fishHooked.GetComponent<FishAI>().pullStrength;
         float fishPullSpeed = moveSpeed;
         float fishPullAcceleration = acceleration;
-        float strafe = movementInput.x;
-        float back = Mathf.Clamp01(-movementInput.y);
 
         Vector3 fishPosition = fishHooked.transform.position;
         Vector3 playerPosition = playerRigidbody.position;
@@ -265,16 +293,73 @@ public class PlayerController : MonoBehaviour
             float tautOver = distanceToFish - tetherRange;
             float tautRampDistance = Mathf.Max(0.01f, tetherRange * 0.3f);
             float taut01 = Mathf.Clamp01(tautOver / tautRampDistance);
-            taut01 = Mathf.SmoothStep(0f, 1f, taut01);
 
             // Start pulling at tetherRange, then strengthen as the line stretches further.
-            fishPullSpeed *= 1f + fishPullStrength * 0.5f * taut01;
-            fishPullAcceleration *= 1f + fishPullStrength * 0.5f * taut01;
+            fishPullSpeed *= fishPullStrength * (1f + taut01);
+            fishPullAcceleration *= 0.5f + taut01;
         }
         float lerpT = fishPullAcceleration * Time.fixedDeltaTime;
         currentVelocity = Vector3.Lerp(currentVelocity, fishDirection * fishPullSpeed, Mathf.Clamp01(lerpT));
 
         playerRigidbody.MovePosition(playerPosition + currentVelocity * Time.fixedDeltaTime);
+
+        //Debug.Log($"Distance to fish: {distanceToFish}");
+    }
+
+    private void UpdateStrafeMovement()
+    {
+        if (fishHooked == null) return;
+
+        float strafeInput = movementInput.x;
+
+        Vector3 fishPos = fishHooked.transform.position;
+        Vector3 toFish = fishPos - playerRigidbody.position;
+
+        // While the boat is still rotating to face the fish, suppress new strafe input
+        // (existing momentum still decelerates) so we don't fight the rotation lerp.
+        float facingAngle = Vector3.Angle(transform.forward, toFish);
+        if (facingAngle > strafeAngle)
+        {
+            strafeInput = 0f;
+        }
+
+        // Work in the horizontal plane: radial = fish->player, tangent = right of that radial.
+        Vector3 toPlayer = -toFish;
+        toPlayer.y = 0f;
+        if (toPlayer.sqrMagnitude < 0.0001f) return;
+
+        float radius = toPlayer.magnitude;
+        Vector3 radialDir = toPlayer / radius;
+        Vector3 tangentDir = Vector3.Cross(radialDir, Vector3.up); // Aligns with transform.right when facing the fish
+
+        // Treat strafe input as a target tangential velocity (mirrors UpdateMovement's accel pattern).
+        Vector3 targetStrafeVelocity = tangentDir * (strafeInput * moveSpeed);
+        if (Mathf.Abs(strafeInput) > 0.1f)
+        {
+            currentStrafeVelocity = Vector3.Lerp(currentStrafeVelocity, targetStrafeVelocity,
+                strafeAcceleration * Time.fixedDeltaTime);
+        }
+        else
+        {
+            currentStrafeVelocity = Vector3.Lerp(currentStrafeVelocity, Vector3.zero,
+                deceleration * Time.fixedDeltaTime);
+        }
+
+        // Strip any accumulated radial component; orbit velocity must stay purely tangential.
+        float tangentSpeed = Vector3.Dot(currentStrafeVelocity, tangentDir);
+        currentStrafeVelocity = tangentDir * tangentSpeed;
+
+        // Step along the tangent, then re-project to the original radius so the path is a true arc
+        // instead of a straight tangent line drifting outward each frame.
+        Vector3 steppedOffset = toPlayer + currentStrafeVelocity * Time.fixedDeltaTime;
+        Vector3 orbitOffset = steppedOffset.normalized * radius;
+
+        // Combine the orbit step with the tether's radial pull from UpdateTetheredMovement.
+        // (Tether's own MovePosition would otherwise be overridden by ours within the same FixedUpdate.)
+        Vector3 newPosition = fishPos + orbitOffset + currentVelocity * Time.fixedDeltaTime;
+        newPosition.y = playerRigidbody.position.y;
+
+        playerRigidbody.MovePosition(newPosition);
     }
 
     private void UpdateTetheredRotation()
@@ -307,6 +392,20 @@ public class PlayerController : MonoBehaviour
         else
         {
             velocityLine.enabled = false;
+        }
+    }
+
+    private void DrawStrafeLine()
+    {
+        if (showStrafe)
+        {
+            strafeLine.enabled = true;
+            strafeLine.SetPosition(0, transform.position);
+            strafeLine.SetPosition(1, transform.position + currentStrafeVelocity * strafeDebugScale);
+        }
+        else
+        {
+            strafeLine.enabled = false;
         }
     }
 

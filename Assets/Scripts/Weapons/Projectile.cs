@@ -23,13 +23,10 @@ public class Projectile : MonoBehaviour
         {
             Debug.Log("Projectile hit a fish!");
 
-            // Send message to combat manager with the hit fish to start combat
-            // SendMessageUpwards("OnFishHit", other.transform.parent.gameObject, SendMessageOptions.DontRequireReceiver);
-
             GameObject hitFish = other.transform.parent.gameObject;
             OnFishHitEvent?.Invoke(hitFish);
 
-            transform.parent = hitFish.transform;
+            transform.SetParent(hitFish.transform, false);
             if (arcMovementCoroutine != null)
             {
                 StopCoroutine(arcMovementCoroutine);

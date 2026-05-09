@@ -18,19 +18,11 @@ public class fishBarCreator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        fishBar.transform.Translate(0.0f, 100.0f, 0.0f);
-        isBarOn = false;
-        fishBar.SetActive(false);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
+        fishBar.SetActive(isBarOn);
     }
 
     //Create the fishing bar based on the stats passed in
-    void createBar(int durability, int catchRate)
+    public void createBar(int durability, int catchRate)
     {
         isBarOn = true;
         fishBar.SetActive(true);
@@ -40,14 +32,14 @@ public class fishBarCreator : MonoBehaviour
     }
 
     //update red section and player indicator in real time based on locationa and durability
-    void updateBar(int durability, float direction)
+    public void updateBar(int durability, float direction)
     {
         redSect.rectTransform.sizeDelta = new Vector2(durability, 90);
         float pos = direction * 1125;
         playerIndicator.rectTransform.anchoredPosition = new Vector2(pos, 0.0f);
     }
 
-    void destroyBar()
+    public void destroyBar()
     {
         isBarOn = false;
         fishBar.SetActive(false);

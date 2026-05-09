@@ -51,7 +51,7 @@ public class FishingLine : MonoBehaviour
             lineRenderer.positionCount = 0;
     }
 
-    void LateUpdate()
+    void FixedUpdate()
     {
         if (!isActive) return;
 
@@ -62,8 +62,13 @@ public class FishingLine : MonoBehaviour
             return;
         }
 
-        Simulate();
+        Simulate(Time.fixedDeltaTime);
         ApplyConstraints();
+    }
+
+    void LateUpdate()
+    {
+        if (!isActive || lineRenderer == null || currentPositions == null) return;
         RenderLine();
         MeasureTension();
     }
@@ -86,9 +91,9 @@ public class FishingLine : MonoBehaviour
         restSegmentLength = Vector3.Distance(startAnchor.position, endAnchor.position) / (nodeCount - 1);
     }
 
-    private void Simulate()
+    private void Simulate(float dt)
     {
-        float dt2 = Time.deltaTime * Time.deltaTime;
+        float dt2 = dt * dt;
 
         for (int i = 1; i < nodeCount - 1; i++)          // Skip pinned endpoints
         {

@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class CombatManager : MonoBehaviour
 {
@@ -8,10 +9,20 @@ public class CombatManager : MonoBehaviour
     public PopupManager popupManager;
     public PauseMenu pauseMenu;
 
+    [Header("Combat Settings")]
+    public float destroyDelay = 1f;
+
+    [Header("Debug")]
+    [SerializeField] private bool debugMousePopup = true;
+    [SerializeField] private float debugDamageValue = 42f;
+    [SerializeField] private LayerMask debugRaycastMask = ~0; // everything
+    [SerializeField] private Sprite debugFishSprite;
+
     private PlayerController playerController;
     private WeaponManager weaponManager;
     private FishAI fishAI;
     private CameraController cameraController;
+    private Coroutine damageRoutine;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -26,6 +37,7 @@ public class CombatManager : MonoBehaviour
 
         Projectile.OnFishHitEvent += OnFishHit;
         PauseMenu.OnPauseEvent += OnPause;
+        PlayerController.AddFishToInventoryEvent += OnAddFishToInventory;
 
         if (fishTarget != null)
         {
@@ -33,15 +45,41 @@ public class CombatManager : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
     void Update()
     {
-        return;
+        if (!debugMousePopup || popupManager == null) return;
+        
+        if (Mouse.current != null && Mouse.current.rightButton.isPressed)
+        {
+            popupManager.GenDamagePopup(debugDamageValue, HelperClass.GetMouseWorldPosition(Camera.main, 100f, debugRaycastMask));;
+        }
+    }
+
+    void LateUpdate()
+    {
+        if (fishTarget != null)
+        {
+            float angleToFish = Vector3.Angle(player.transform.forward, fishTarget.transform.position - player.transform.position);
+            pauseMenu.GetComponent<fishBarCreator>().updateBar((int)fishAI.health*5, (angleToFish+90f)/180f);
+        }
     }
 
     public void OnPause(bool paused)
     {
         playerController.OnPause(paused);
+    }
+
+    public void OnAddFishToInventory(string fishName, int quantity)
+    {
+        if (pauseMenu != null)
+        {
+            // TODO: Store fish sprite in FishStats structure and send it as parameter instead of `string fishName`
+            pauseMenu.addFish(fishName, quantity, debugFishSprite);
+        }
+        else
+        {
+            Debug.LogWarning("PauseMenu not found, cannot add fish to inventory");
+        }
     }
 
     public void OnFishHit(GameObject fish)
@@ -53,34 +91,67 @@ public class CombatManager : MonoBehaviour
         fishAI = fishTarget.GetComponent<FishAI>();
         if (fishAI == null) return;
 
+        StopDamageRoutine();
         playerController.EnterCombat(fishTarget);
         fishAI.EnterCombat();
-        cameraController.EnterCombatView(player.transform, fishTarget.transform);
-        StartCoroutine(DealDamageToFish());
+        if (cameraController != null)
+        {
+            cameraController.EnterCombatView(player.transform, fishTarget.transform);
+        }
+        damageRoutine = StartCoroutine(DealDamageToFish(fishTarget, fishAI));
+
+        pauseMenu.GetComponent<fishBarCreator>().createBar((int)fishAI.health*5, 100);
     }
 
-    IEnumerator DealDamageToFish()
+    IEnumerator DealDamageToFish(GameObject targetFish, FishAI targetFishAI)
     {
-        while (fishAI != null && fishTarget != null && weaponManager != null)
+        while (targetFishAI != null && targetFish != null && weaponManager != null)
         {
+            if (fishTarget != targetFish || fishAI != targetFishAI)
+            {
+                yield break;
+            }
+
             float damage = weaponManager.CalculateDamage();
-            fishAI.TakeDamage(damage);
-            popupManager.GenDamagePopup(damage, fishTarget.transform.position);
-            if (fishAI.isCaptured)
+            targetFishAI.TakeDamage(damage);
+            if (popupManager != null)
+            {
+                popupManager.GenDamagePopup(damage, targetFish.transform.position);
+            }
+            if (targetFishAI.isCaptured)
             {
                 break;
             }
-            yield return new WaitForSeconds(weaponManager.CalculateFireRate());
+
+            float fireInterval = Mathf.Max(0.02f, weaponManager.CalculateFireRate());
+            yield return new WaitForSeconds(fireInterval);
         }
-        cameraController.ExitCombatView();
+
+        if (cameraController != null)
+        {
+            cameraController.ExitCombatView();
+        }
         if (playerController != null && playerController.fishHooked != null)
         {
-            playerController.ExitCombat();
+            pauseMenu.GetComponent<fishBarCreator>().destroyBar();
+            playerController.ExitCombat(destroyDelay);
+        }
+        damageRoutine = null;
+    }
+
+    private void StopDamageRoutine()
+    {
+        if (damageRoutine != null)
+        {
+            StopCoroutine(damageRoutine);
+            damageRoutine = null;
         }
     }
 
     private void OnDestroy()
     {
+        StopDamageRoutine();
         Projectile.OnFishHitEvent -= OnFishHit;
+        PauseMenu.OnPauseEvent -= OnPause;
     }
 }
